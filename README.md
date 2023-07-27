@@ -1,7 +1,7 @@
 # Pluto
-# The App Store Repository for Pluto
+## The App Store Repository for Pluto
 
-## How do I submit my app?
+### How do I submit my app?
 To submit your app please make a pull request with a good description and title of your app, We will also need your name you want to publish the app as.
 We will then thoroughly review your app and inform you of any changes you need to make, We take security seriously!
 Once you have passed these tests your app will be pulished to the public repo and app store.
