@@ -1,14 +1,16 @@
 import JSON5 from "https://unpkg.com/json5@2/dist/index.min.mjs";
 
 let packageList = [];
+let host = "./";
 
 export default {
-  async init() {
-    packageList = await fetch("./listing.json").then((j) => j.json());
+  async init(hst) {
+    host = hst;
+    packageList = await fetch(host + "listing.json").then((j) => j.json());
   },
   list: (_) => packageList,
   async fetch(pkg) {
-    const metaData = await fetch(`./pkgs/${pkg}/meta.json5`).then((j) =>
+    const metaData = await fetch(host + `pkgs/${pkg}/meta.json5`).then((j) =>
       j.text()
     );
     const meta = JSON5.parse(metaData);
