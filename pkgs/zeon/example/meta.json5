@@ -1,0 +1,10 @@
+{
+  name: "Example App",
+  description: "An example test application that opens an iframe to zeon.dev",
+  author: "Zeon",
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+}
