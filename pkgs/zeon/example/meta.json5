@@ -6,7 +6,7 @@
   description: "An example application that opens a window showing the Zeon.dev website",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Zeon",
-  // The MAXIMUM core version your app is compatible with.
+  // The minimum core version your app is compatible with.
   // 1.2 brought some big changes so it should be targeted as the default
   compatibleWith: 1.2,
   // App assets (shown in the app store)
