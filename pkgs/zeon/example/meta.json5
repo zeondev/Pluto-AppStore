@@ -3,14 +3,14 @@
   // Name for your application
   name: "Zeon Example",
   // A simple description for your application
-  shortDescription: "An example app compatible with v1.2",
+  shortDescription: "An example app compatible with v1.3",
   // Description for your application
   description: "An example application that opens a window showing the Zeon.dev website",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Zeon",
   // The minimum core version your app is compatible with.
   // 1.2 brought some big changes so it should be targeted as the default
-  compatibleWith: 1.2,
+  compatibleWith: 1.3,
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
