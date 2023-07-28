@@ -1,7 +1,9 @@
 // An example metadata file for an application
 {
   // Name for your application
-  name: "Example App",
+  name: "Zeon Example",
+  // A simple description for your application
+  shortDescription: "An example app.",
   // Description for your application
   description: "An example application that opens a window showing the Zeon.dev website",
   // Who created this app? Should be the same as the folder name, or a localized string version.
