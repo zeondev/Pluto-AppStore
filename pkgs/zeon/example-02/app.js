@@ -1,7 +1,7 @@
 export default {
   name: "Zeon Example",
   description: "Example application by Zeon that opens an iframe.",
-  ver: 1.2, // Compatible with core v1.2
+  ver: 1, // Compatible with core v1
   type: "process",
   exec: async function (Root) {
     let wrapper;
