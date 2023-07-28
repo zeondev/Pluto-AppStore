@@ -1,10 +1,28 @@
+// An example metadata file for an application
 {
+  // Name for your application
   name: "Example App",
-  description: "An example test application that opens an iframe to zeon.dev",
+  // Description for your application
+  description: "An example application that opens a window showing the Zeon.dev website",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Zeon",
+  // The MAXIMUM core version your app is compatible with.
+  // 1.2 brought some big changes so it should be targeted as the default
+  compatibleWith: 1.2,
+  // App assets (shown in the app store)
   assets: {
     path: "app.js",
     icon: "assets/icon.svg",
     banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Example App",
+      description: "An example application that opens a window showing the Zeon.dev website",
+    },
   },
 }
