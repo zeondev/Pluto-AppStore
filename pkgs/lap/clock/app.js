@@ -1,7 +1,7 @@
 export default {
   name: "Clock",
   description: "A basic clock app for Pluto",
-  ver: 1.2, // Compatible with core v1.2
+  ver: 1.3, // Compatible with core v1.3
   type: "process",
   exec: async function (Root) {
     let wrapper;

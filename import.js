@@ -6,7 +6,9 @@ let host = "./";
 export default {
   async init(hst) {
     host = hst;
-    packageList = await fetch(host + "listing.json").then((j) => j.json());
+    packageList = await fetch(host + "listing.json?t=" + Date.now()).then((j) =>
+      j.json()
+    );
   },
   list: (_) => packageList,
   async fetch(pkg) {
