@@ -1,0 +1,30 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "Theme Editor",
+  // A simple description for your application
+  shortDescription: "A simple app to make your own themes",
+  // Description for your application
+  description: "A simple app to make your own Pluto themes.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Kat21",
+  // The minimum core version your app is compatible with.
+  // 1.2 brought some big changes so it should be targeted as the default
+  compatibleWith: 1.4,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Theme Editor",
+      description: "A simple app to make your own Pluto themes.",
+    },
+  },
+}
