@@ -376,7 +376,7 @@ export default {
           let result = await Root.Modal.prompt(
             "Warning",
             "You have unsaved changes, are you sure you want to exit?",
-            NpWindow.window
+            MyWindow.window
           );
           if (result !== true) {
             return false;
