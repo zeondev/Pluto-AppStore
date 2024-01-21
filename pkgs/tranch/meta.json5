@@ -1,0 +1,30 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "YouTube (alpha)",
+  // A simple description for your application
+  shortDescription: "A YouTube app for Pluto",
+  // Description for your application
+  description: "Watch YouTube videos and get recommendations with the native YouTube app for Pluto.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Tranch Software",
+  // The minimum core version your app is compatible with.
+  // 1.2 brought some big changes so it should be targeted as the default
+  compatibleWith: 1.5,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.png",
+    banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "YouTube (alpha)",
+      description: "Watch YouTube videos and get recommendations with the native YouTube app for Pluto.",
+    },
+  },
+}
