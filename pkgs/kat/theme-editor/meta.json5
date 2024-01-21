@@ -10,7 +10,7 @@
   author: "Kat21",
   // The minimum core version your app is compatible with.
   // 1.2 brought some big changes so it should be targeted as the default
-  compatibleWith: 1.4,
+  compatibleWith: 1.5,
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
