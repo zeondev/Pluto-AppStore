@@ -14,7 +14,7 @@
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
-    icon: "assets/icon.png",
+    icon: "assets/icon.svg",
     banner: null,
   },
   // Example section for localization
