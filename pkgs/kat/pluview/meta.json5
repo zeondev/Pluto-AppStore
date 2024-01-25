@@ -1,0 +1,29 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "Pluview",
+  // A simple description for your application
+  shortDescription: "Develop TypeScript apps for Pluto",
+  // Description for your application
+  description: "Develop TypeScript apps for Pluto.\n\nNOTE: This application does not have a GUI and is not an application for normal users.\n\nMade for use alongside the Pluto TypeScript Dev Environment.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Kat21",
+  // The minimum core version your app is compatible with.
+  compatibleWith: 1.5,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.png",
+    banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Pluview",
+      description: "Develop TypeScript apps for Pluto.\n\nNOTE: This application does not have a GUI and is not an application for normal users.",
+    },
+  },
+}
