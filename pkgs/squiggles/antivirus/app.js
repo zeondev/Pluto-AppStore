@@ -7,7 +7,7 @@ export default {
 		let wrapper;
 		let AntivirusWindow;
 
-		Root.Lib.setOnEnd((_) => {ClockWindow.close(); clearInterval(clockInterval)});
+		Root.Lib.setOnEnd((_) => {AntivirusWindow.close();});
 
 		const Win = (await Root.Lib.loadLibrary("WindowSystem")).win;
 
