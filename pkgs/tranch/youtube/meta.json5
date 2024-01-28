@@ -8,6 +8,9 @@
   description: "Watch YouTube videos and get recommendations with the native YouTube app for Pluto.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Tranch Software",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Entertainment",
   // The minimum core version your app is compatible with.
   // 1.2 brought some big changes so it should be targeted as the default
   compatibleWith: 1.5,

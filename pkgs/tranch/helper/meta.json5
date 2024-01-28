@@ -1,13 +1,13 @@
 // An example metadata file for an application
 {
   // Name for your application
-  name: "Clock",
+  name: "Helper AI Assistant (early alpha)",
   // A simple description for your application
-  shortDescription: "A basic clock app.",
+  shortDescription: "An AI assistant powered by GPT-4 on Pluto.",
   // Description for your application
-  description: "A basic clock app for Pluto",
+  description: "Have a personal 'everything' in your hands with Helper, an AI assistant with expandable capabilities. Currently works with the latest version of the YouTube app.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
-  author: "Lap",
+  author: "Tranch Software",
   // The catergory of your app. Should be one of the following:
   // "Entertainment", "Work", "Play"
   category: "Work",
@@ -26,8 +26,8 @@
   localization: {
     // English (United States)
     en_US: {
-      name: "Clock",
-      description: "A basic clock app for Pluto",
+      name: "Helper AI Assistant (early alpha)",
+      description: "Have a personal 'everything' in your hands with Helper, an AI assistant with expandable capabilities. Currently works with the latest version of the YouTube app.",
     },
   },
 }

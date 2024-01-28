@@ -8,6 +8,9 @@
   description: "Develop TypeScript apps for Pluto.\n\nNOTE: This application does not have a GUI and is not an application for normal users.\n\nMade for use alongside the Pluto TypeScript Dev Environment.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Kat21",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Work",
   // The minimum core version your app is compatible with.
   compatibleWith: 1.5,
   // App assets (shown in the app store)
