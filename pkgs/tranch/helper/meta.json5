@@ -1,0 +1,33 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "Helper AI Assistant (early alpha)",
+  // A simple description for your application
+  shortDescription: "An AI assistant powered by GPT-4 on Pluto.",
+  // Description for your application
+  description: "Have a personal 'everything' in your hands with Helper, an AI assistant with expandable capabilities. Currently works with the latest version of the YouTube app.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Tranch Software",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Work",
+  // The minimum core version your app is compatible with.
+  // 1.2 brought some big changes so it should be targeted as the default
+  compatibleWith: 1.5,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Helper AI Assistant (early alpha)",
+      description: "Have a personal 'everything' in your hands with Helper, an AI assistant with expandable capabilities. Currently works with the latest version of the YouTube app.",
+    },
+  },
+}
