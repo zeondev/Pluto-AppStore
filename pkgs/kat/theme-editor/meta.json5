@@ -8,6 +8,9 @@
   description: "A simple app to make your own Pluto themes.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Kat21",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Work",
   // The minimum core version your app is compatible with.
   // 1.2 brought some big changes so it should be targeted as the default
   compatibleWith: 1.5,
