@@ -1,1 +1,8 @@
-["kat/pluview","kat/theme-editor","lap/clock","tranch/youtube","zeon/example"]
+[
+  "kat/pluview",
+  "kat/theme-editor",
+  "lap/clock",
+  "tranch/youtube",
+  "tranch/helper",
+  "zeon/example"
+]
