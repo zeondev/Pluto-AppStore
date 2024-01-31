@@ -95,17 +95,39 @@ export default {
 
     let mainWrapper = new Html("div")
       .class("gap", "row-wrap", "fc", "fg")
+      .style({ position: "relative" })
       .appendTo(wrapper);
 
-    function makeStationButton(name, displayName) {
-      return new Html("button").text(displayName).on("click", () => {
-        goToStation(name);
-      });
+    let connectingBox = new Html("div")
+      .style({
+        position: "absolute",
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        "background-color": "rgba(var(--root-rgb), 0.85)",
+        display: "flex",
+        "justify-content": "center",
+        "align-items": "center",
+      })
+      .text("Connecting...")
+      .appendTo(mainWrapper);
+
+    function showConnectingBox() {
+      connectingBox.classOn("fadeIn").classOff("fadeOut");
     }
 
+    function hideConnectingBox() {
+      connectingBox.classOn("fadeOut").classOff("fadeIn");
+    }
+
+    showConnectingBox();
+
     let albumArt = new Html("img")
-      .styleJs({
+      .attr({
         src: "https://ic.cherries.to/art/unknown.svg",
+      })
+      .styleJs({
         width: "128px",
         height: "128px",
         borderRadius: "8px",
@@ -151,20 +173,29 @@ export default {
           (station === null ? "radio" : encodeURIComponent(station)),
         {
           playbackMethod: "html5", // preferred for most instances
+          onLoad() {
+            showConnectingBox();
+          },
+          onPlay() {
+            hideConnectingBox();
+          },
           onMetadata: (metadata) => {
             console.log(metadata);
             songName.text(metadata.TITLE || "<unknown>");
             artistName.text(metadata.ARTIST || "<unknown>");
             albumName.text(metadata.ALBUM || "<unknown>");
-            albumArt.elm.src =
-              album_covers[`${metadata.ARTIST} - ${metadata.ALBUM}`] !==
-              undefined
-                ? `https://ic.cherries.to/` +
-                  album_covers[`${metadata.ARTIST} - ${metadata.ALBUM}`]
-                : "https://ic.cherries.to/art/unknown.svg";
-            // document.getElementById("metadata").innerHTML = metadata.StreamTitle;
-
-            RadioWindow.setTitle(`${station} | ic.cherries.to`);
+            if (metadata.ARTIST !== undefined && metadata.ALBUM !== undefined) {
+              albumArt.elm.src =
+                `https://ic.cherries.to/` +
+                album_covers[
+                  `${metadata.ARTIST.trim()} - ${metadata.ALBUM.trim()}`
+                ];
+            } else {
+              albumArt.elm.src = "https://ic.cherries.to/art/unknown.svg";
+            }
+            RadioWindow.setTitle(
+              `Listening to ${station.substring(0, 1).toUpperCase() + station.substring(1)} | Cherries.to Radio`,
+            );
             if (metadata.TITLE && metadata.ARTIST) {
               const albumCover =
                 album_covers[`${metadata.ARTIST} - ${metadata.ALBUM}`] ||
@@ -190,6 +221,7 @@ export default {
         },
       );
       player = p;
+      window.p = p;
       console.log(player);
       player.play();
     }
@@ -275,7 +307,13 @@ export default {
     }
 
     return Root.Lib.setupReturns((m) => {
-      console.log("Example received message: " + m);
+      if (m.type === "setStation") {
+        if (stations.includes(m.data)) {
+          station = m.data;
+          swapStation();
+          return true;
+        } else return false;
+      }
     });
   },
 };

@@ -16,13 +16,18 @@
   // The version history of your app (descending).
   versions: [
     {
+      ver: "1.1.0",
+      cmp: 1.5,
+      date: "2024-01-30T21:58:00.000Z",
+    },
+    {
       ver: "1.0.0",
       cmp: 1.5,
       date: "2024-01-28T22:27:00.000Z",
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "You can now play from stations and swap stations in the app!",
+  latestVersionInfo: "Station switching just got easier! Try it out in the latest update.",
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
