@@ -1,9 +1,9 @@
 // An example metadata file for an application
 {
   // Name for your application
-  name: "Zeon Example",
+  name: "Zeon Website",
   // A simple description for your application
-  shortDescription: "An example app compatible with v1.3",
+  shortDescription: "Browse the Zeon.dev website",
   // Description for your application
   description: "An example application that opens a window showing the Zeon.dev website",
   // Who created this app? Should be the same as the folder name, or a localized string version.
@@ -21,6 +21,11 @@
   },
   // The version history of your app (descending).
   versions: [
+    {
+      ver: "1.0.2",
+      cmp: 1.5,
+      date: "2024-02-01T08:23:00.000Z",
+    },
     {
       ver: "1.0.1",
       cmp: 1.5,
