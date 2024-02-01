@@ -38,7 +38,7 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "🎲 RANDOMIZER 🎲\nRandomly create ktats with only a few clicks!\n\n✨ PLAYGROUND ✨\nHave fun in the new Playground mode!\n\n• Click the boombox to play a song\n• Drag your ktats around the screen and double-click to change their pose",
+  latestVersionInfo: "🎲 RANDOMIZER 🎲\nRandomly create ktats with only a few clicks!\n\n✨ PLAYGROUND ✨\nHave fun in the new Playground mode!\n• Click the boombox to play a song\n• Drag your ktats around the screen and double-click to change their pose",
   localization: {
     en_US: {
       name: "Build a Ktat",

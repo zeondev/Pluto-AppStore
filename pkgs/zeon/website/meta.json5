@@ -5,7 +5,7 @@
   // A simple description for your application
   shortDescription: "Browse the Zeon.dev website",
   // Description for your application
-  description: "An example application that opens a window showing the Zeon.dev website",
+  description: "Browse the Zeon.dev website in Pluto!",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Zeon",
   // The catergory of your app. Should be one of the following:
@@ -38,7 +38,7 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "Updated the example app for new version 1.5",
+  latestVersionInfo: "Quality of life improvements when using the app.",
   // Example section for localization
   // (not currently implemented but planned to be supported)
   // !! You can remove this section if you don't have any localized metadata. !!

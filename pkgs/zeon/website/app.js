@@ -18,6 +18,8 @@ export default {
       title: "Zeon",
       content: '<iframe src="https://zeon.dev/">',
       pid: Root.PID,
+      width: 640,
+      height: 480,
       onclose: () => {
         Root.Lib.onEnd();
       },
