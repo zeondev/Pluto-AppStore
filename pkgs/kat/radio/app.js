@@ -46,7 +46,7 @@ export default {
       "https://ic.cherries.to/icecast-metadata-player-1.13.1.min.js",
     );
 
-    const album_covers = await fetch("https://ic.cherries.to/album_art.json")
+    const album_covers = await fetch("https://ic.cherries.to/album_art.json?t=" + Date.now())
       .then((j) => j.json())
       .catch(console.error);
 
@@ -75,7 +75,7 @@ export default {
 
     let station = "radio";
     let i = 0;
-    let stations = ["radio", "synthwave", "wagoogus"];
+    let stations = await (await fetch("https://ic.cherries.to/stations.json?t=" + Date.now()).then(t => t.json()));
 
     new Html("button")
       .text("Swap Station")
