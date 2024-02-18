@@ -63,7 +63,7 @@ export default {
           "An integration that lets Helper search and play videos from your favorite creators.",
         pid: Root.PID,
         id: "yt",
-        packageName: "YouTube (alpha).app",
+        packageName: "tranch--youtube.app",
         functions: [
           {
             name: "youtubeSearch",

@@ -1,39 +1,28 @@
 // An example metadata file for an application
 {
   // Name for your application
-  name: "YouTube (alpha)",
+  name: "Pluto Contacts (early alpha)",
   // A simple description for your application
-  shortDescription: "A YouTube app for Pluto",
+  shortDescription: "A contacts app for Pluto.",
   // Description for your application
-  description: "Watch YouTube videos and get recommendations with the native YouTube app for Pluto.",
+  description: "Add and call contacts with a Zeon account on Pluto Contacts.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Tranch Software",
   // The catergory of your app. Should be one of the following:
   // "Entertainment", "Work", "Play"
-  category: "Entertainment",
+  category: "Work",
   // The minimum core version your app is compatible with.
   compatibleWith: 1.5,
   // The version history of your app (descending).
   versions: [
     {
-      ver: "1.0.2",
+      ver: "1.0.0",
       cmp: 1.5,
       date: "2024-02-18T09:20:53.528Z",
     },
-    {
-      ver: "1.0.1",
-      cmp: 1.5,
-      date: "2024-01-28T08:42:00.000Z",
-    },
-    {
-      ver: "1.0.0",
-      cmp: 1.5,
-      date: "2024-01-21T22:01:00.000Z",
-    },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "YouTube app 1.0.2 update: what's new? \n\
-• Updated integration for Helper API update",
+  latestVersionInfo: "",
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
@@ -46,8 +35,8 @@
   localization: {
     // English (United States)
     en_US: {
-      name: "YouTube (alpha)",
-      description: "Watch YouTube videos and get recommendations with the native YouTube app for Pluto.",
+      name: "Pluto Contacts (early alpha)",
+      description: "Add and call contacts with a Zeon account on Pluto Contacts.",
     },
   },
 }

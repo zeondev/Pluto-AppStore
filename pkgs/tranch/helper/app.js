@@ -45,8 +45,10 @@ export default {
     const helperInfPath = "Registry/helperInfo";
     const helperInfExists = await vfs.exists(helperInfPath);
 
+    const currentVersion = 2;
+
     let currentState = {
-      version: 1,
+      version: currentVersion,
       open: false,
       pid: Root.PID,
       integrations: [],
@@ -71,6 +73,20 @@ export default {
       if (currentState.open) {
         affected = false;
       }
+      if (currentState.version != currentVersion) {
+        console.log("Mismatched Helper versions detected");
+        Notify.show(
+          "Helper",
+          "A new Helper API update has been released. Please update all your apps that take advantage of it and open them to be integrated again."
+        );
+        currentState = {
+          version: currentVersion,
+          open: false,
+          pid: Root.PID,
+          integrations: [],
+          setupDone: false,
+        };
+      }
       await vfs.writeFile(helperInfPath, JSON.stringify(currentState, null, 2));
     } else {
       await vfs.writeFile(helperInfPath, JSON.stringify(currentState, null, 2));
@@ -91,7 +107,7 @@ export default {
       {
         role: "system",
         content:
-          "You're Helper, an AI assistant on the Pluto operating system with the ability to run functions from apps.",
+          "You're Helper, an AI assistant with the ability to run functions from apps and integrations provided by the user.",
       },
     ];
 
@@ -280,7 +296,7 @@ export default {
       if (processFound) {
         process = Root.Core.processList[procID];
       } else {
-        const appPath = "Root/Pluto/apps/" + integration.packageName;
+        const appPath = "Registry/AppStore/" + integration.packageName;
         const appExists = await vfs.exists(appPath);
         if (appExists) {
           const curApp = await Root.Core.startPkg(
@@ -290,6 +306,26 @@ export default {
           );
           if (curApp != false) {
             process = curApp;
+          }
+        } else {
+          createStatus(
+            "Error",
+            `Application tied to integration "${processName}" not found`
+          );
+          let response = await generateResponseFromFunc(
+            `HelperCore: Application "${integration.name} not found. It may have been uninstalled, or the app's developer has provided wrong information."`
+          );
+          console.log(response);
+          context.push(response);
+          if (response.content) {
+            convLog.push({ from: "assistant", message: response.content });
+            createMessage(response.content);
+          }
+          if ("function_call" in response) {
+            execFunction(
+              response.function_call.name,
+              JSON.parse(response.function_call.arguments)
+            );
           }
         }
       }
