@@ -28,6 +28,8 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
+  latestVersionInfo: "Browse the website with ease!",
+  // A long description (text only) of the details of the latest update.
   localization: {
     en_US: {
       name: "thats-the.name",
