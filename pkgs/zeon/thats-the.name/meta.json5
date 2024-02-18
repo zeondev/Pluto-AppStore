@@ -1,0 +1,37 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "thats-the.name",
+  // A simple description for your application
+  shortDescription: "A simple website hosting service.",
+  // Description for your application
+  description: "yep! that's the name, a simple static website hosting service for people who want to host a website, but don't want to pay for a domain name. we'll give you a subdomain, and you can host your website on our servers. it's that simple!",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Zeon",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Work",
+  // The minimum core version your app is compatible with.
+  compatibleWith: 1.5,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+  // The version history of your app (descending).
+  versions: [
+    {
+      ver: "1.0.0",
+      cmp: 1.0,
+      date: "2023-02-18T22:15:53.000Z",
+    },
+  ],
+  // A long description (text only) of the details of the latest update.
+  localization: {
+    en_US: {
+      name: "thats-the.name",
+      description: "yep! that's the name, a simple static website hosting service for people who want to host a website, but don't want to pay for a domain name. we'll give you a subdomain, and you can host your website on our servers. it's that simple!",
+    },
+  },
+}
