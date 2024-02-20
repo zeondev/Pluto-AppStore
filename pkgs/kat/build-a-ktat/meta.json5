@@ -22,6 +22,11 @@
   // The version history of your app (descending).
   versions: [
     {
+      ver: "1.0.3",
+      cmp: 1.5,
+      date: "2024-02-20T15:29:00.000Z",
+    },
+    {
       ver: "1.0.2",
       cmp: 1.5,
       date: "2024-01-28T18:32:00.000Z",
@@ -38,7 +43,7 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "🎲 RANDOMIZER 🎲\nRandomly create ktats with only a few clicks!\n\n✨ PLAYGROUND ✨\nHave fun in the new Playground mode!\n• Click the boombox to play a song\n• Drag your ktats around the screen and double-click to change their pose",
+  latestVersionInfo: "🌎 WORLD 🌏\nPlay online with others and explore an unlimited world with your Ktats!\n\n🎲 RANDOMIZER 🎲\nRandomly create ktats with only a few clicks!\n\n✨ PLAYGROUND ✨\nHave fun in the new Playground mode!\n• Click the boombox to play a song\n• Drag your ktats around the screen and double-click to change their pose",
   localization: {
     en_US: {
       name: "Build a Ktat",

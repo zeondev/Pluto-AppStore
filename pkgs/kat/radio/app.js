@@ -168,7 +168,7 @@ export default {
         player.stop();
       }
       console.log("attempting swap to", station);
-      let p = new IcecastMetadataPlayer(
+      let p = new window.IcecastMetadataPlayer(
         "https://ic.cherries.to/" +
           (station === null ? "radio" : encodeURIComponent(station)),
         {
