@@ -287,7 +287,8 @@ export default {
       console.log(Root.Core.processList);
       Root.Core.processList.forEach((process) => {
         if (process) {
-          if (process.proc.name == processName) {
+          console.log(process);
+          if (process.proc && process.proc.name == processName) {
             procID = process.pid;
             processFound = true;
           }
@@ -566,7 +567,7 @@ export default {
           marginTop: "10px",
           marginBottom: "10px",
           marginLeft: "5px",
-          padding: "10px",
+          padding: "15px",
           width: "90%",
         });
       let statusItem = new Html("div")
@@ -592,6 +593,9 @@ export default {
     }
 
     async function sendMessage(message) {
+      if (message.trim() == "") {
+        return;
+      }
       createMessage(message, true);
       let response = await generateResponse(message);
       console.log(response);
@@ -619,7 +623,7 @@ export default {
       let pageDesc = new Html("p")
         .appendTo(pageInfo)
         .text(
-          "These are Helper integrations added by apps, which let you do certain actions by simply asking Helper. Uninstalling the app removes the integration."
+          "These are Helper integrations added by apps, which let you do certain actions by simply asking Helper. Take note that removing the integration may not guarantee full removal."
         );
       let integrationListDiv = new Html("div").appendTo(container).styleJs({
         display: "flex",
@@ -635,12 +639,31 @@ export default {
           let card = new Html("div")
             .class("card")
             .appendTo(integrationListDiv)
-            .styleJs({ marginTop: "10px", marginBottom: "10px", width: "90%" });
+            .styleJs({
+              marginTop: "10px",
+              marginBottom: "10px",
+              width: "90%",
+              padding: "15px",
+            });
           let integrationItem = new Html("div")
             .class("flex-group", "col")
             .appendTo(card);
-          new Html("h1").text(integration.name).appendTo(integrationItem);
+          new Html("h1")
+            .text(integration.name + " (" + integration.id + ")")
+            .appendTo(integrationItem);
           new Html("p").text(integration.description).appendTo(integrationItem);
+          new Html("button")
+            .text("Remove integration")
+            .appendTo(integrationItem)
+            .on("click", async () => {
+              let curIndex = currentState.integrations.indexOf(integration);
+              currentState.integrations.splice(curIndex, 1);
+              await vfs.writeFile(
+                helperInfPath,
+                JSON.stringify(currentState, null, 2)
+              );
+              card.cleanup();
+            });
         });
         if (currentState.integrations.length == 0) {
           new Html("h1")
