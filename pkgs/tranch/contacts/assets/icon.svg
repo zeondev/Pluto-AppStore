@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-user-round">
-    <path d="M18 20a6 6 0 0 0-12 0" />
-    <circle cx="12" cy="10" r="4" />
-    <circle cx="12" cy="12" r="10" />
+<svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="52" height="52" rx="26" fill="#212428"/>
+<path d="M38 42C38 38.8174 36.7357 35.7652 34.4853 33.5147C32.2348 31.2643 29.1826 30 26 30C22.8174 30 19.7652 31.2643 17.5147 33.5147C15.2643 35.7652 14 38.8174 14 42" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M26 30C30.4183 30 34 26.4183 34 22C34 17.5817 30.4183 14 26 14C21.5817 14 18 17.5817 18 22C18 26.4183 21.5817 30 26 30Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M26 46C37.0457 46 46 37.0457 46 26C46 14.9543 37.0457 6 26 6C14.9543 6 6 14.9543 6 26C6 37.0457 14.9543 46 26 46Z" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>
