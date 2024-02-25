@@ -12,7 +12,7 @@
   // "Entertainment", "Work", "Play"
   category: "Play",
   // The minimum core version your app is compatible with.
-  compatibleWith: 1.5,
+  compatibleWith: 1.6,
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
