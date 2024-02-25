@@ -5,7 +5,7 @@
   // A simple description for your application
   shortDescription: "A contacts app for Pluto.",
   // Description for your application
-  description: "Add and call contacts with a Zeon account on Pluto Contacts.",
+  description: "Add and call contacts with a Zeon account on Pluto Contacts. It can also be added as a Helper integration.",
   // Who created this app? Should be the same as the folder name, or a localized string version.
   author: "Tranch Software",
   // The catergory of your app. Should be one of the following:
@@ -28,15 +28,5 @@
     path: "app.js",
     icon: "assets/icon.svg",
     banner: null,
-  },
-  // Example section for localization
-  // (not currently implemented but planned to be supported)
-  // !! You can remove this section if you don't have any localized metadata. !!
-  localization: {
-    // English (United States)
-    en_US: {
-      name: "Pluto Contacts (early alpha)",
-      description: "Add and call contacts with a Zeon account on Pluto Contacts.",
-    },
   },
 }

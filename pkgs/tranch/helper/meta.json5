@@ -16,6 +16,11 @@
   // The version history of your app (descending).
   versions: [
     {
+      ver: "1.0.2",
+      cmp: 1.5,
+      date: "2024-02-22T07:31:56.966Z",
+    },
+    {
       ver: "1.0.1",
       cmp: 1.5,
       date: "2024-02-18T09:20:53.528Z",
@@ -27,21 +32,11 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "MAJOR API UPDATE: Please update all Helper compatible apps you have installed before installing this update.",
+  latestVersionInfo: "Added an option to temporarily remove integrations",
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
     icon: "assets/icon.svg",
     banner: null,
-  },
-  // Example section for localization
-  // (not currently implemented but planned to be supported)
-  // !! You can remove this section if you don't have any localized metadata. !!
-  localization: {
-    // English (United States)
-    en_US: {
-      name: "Helper AI Assistant (early alpha)",
-      description: "Have a personal 'everything' in your hands with Helper, an AI assistant with expandable capabilities. Currently works with the latest version of the YouTube app and the Pluto Contacts app.",
-    },
   },
 }
