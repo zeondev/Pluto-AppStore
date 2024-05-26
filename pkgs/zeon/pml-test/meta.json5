@@ -1,0 +1,36 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "Zeon PML tesst",
+  // A simple description for your application
+  shortDescription: "Testing PML support for the App Store.",
+  // Description for your application
+  description: "Test PML on your pluto instance by downloading it from the app store.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Zeon",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Play",
+  // The minimum core version your app is compatible with.
+  compatibleWith: 1.6,
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.pml",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+  // The version history of your app (descending).
+  versions: [],
+  // A long description (text only) of the details of the latest update.
+  latestVersionInfo: "Quality of life improvements when using the app.",
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Example App",
+      description: "An example application that opens a window showing the Zeon.dev website",
+    },
+  },
+}
