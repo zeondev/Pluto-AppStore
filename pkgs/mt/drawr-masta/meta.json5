@@ -1,0 +1,42 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "Drawr Masta",
+  // A simple description for your application
+  shortDescription: "Draw anything.",
+  // Description for your application
+  description: "Draw whatever you want and send it off (Terrible Game)",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "mt",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Play",
+  // The minimum core version your app is compatible with.
+  compatibleWith: 1.6,
+  // The version history of your app (descending).
+  versions: [
+    {
+      ver: "1.0.0",
+      cmp: 1.5,
+      date: "2024-06-12T00:52:00.000Z",
+    },
+  ],
+  // A long description (text only) of the details of the latest update.
+  latestVersionInfo: "",
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.png",
+    banner: null,
+  },
+  // Example section for localization
+  // (not currently implemented but planned to be supported)
+  // !! You can remove this section if you don't have any localized metadata. !!
+  localization: {
+    // English (United States)
+    en_US: {
+      name: "Drawr Masta",
+      description: "Draw whatever you want and send it off (Terrible Game)",
+    },
+  },
+}
