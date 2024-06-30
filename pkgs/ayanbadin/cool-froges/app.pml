@@ -27,13 +27,13 @@
     background-image: linear-gradient(93deg, rgba(255,0,0,1) 0%, rgba(254,255,0,1) 20%, rgba(0,255,0,1) 40%, rgba(0,255,214,1) 60%, rgba(0,4,255,1) 80%, rgba(255,0,219,1) 100%);
     color: transparent;
       font-size: 50px;
-      font-family: "Comic Sans MS";
+      font-family: cursive;
       display: inline-block;
     }
     
  #this p {
     font-size: 30px;
-    font-family: "Comic Sans MS";
+    font-family: cursive;
     margin-top: 50px;
     }
   </style>
