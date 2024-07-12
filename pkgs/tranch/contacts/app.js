@@ -39,7 +39,7 @@ export default {
 
     // Create a window
     PCWindow = new Win({
-      title: "Pluto Contacts",
+      title: "M.F.S Contacts",
       content: "Loading...",
       pid: Root.PID,
       width: 854,
