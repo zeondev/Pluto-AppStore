@@ -1,0 +1,32 @@
+// An example metadata file for an application
+{
+  // Name for your application
+  name: "PlutoCast (early alpha)",
+  // A simple description for your application
+  shortDescription: "Pluto's screen mirroring protocol.",
+  // Description for your application
+  description: "Project your screen to PlutoCast compatible devices.",
+  // Who created this app? Should be the same as the folder name, or a localized string version.
+  author: "Tranch Software",
+  // The catergory of your app. Should be one of the following:
+  // "Entertainment", "Work", "Play"
+  category: "Work",
+  // The minimum core version your app is compatible with.
+  compatibleWith: 1.6,
+  // The version history of your app (descending).
+  versions: [
+    {
+      ver: "1.0.0",
+      cmp: 1.5,
+      date: "2024-10-30T04:04:21.963Z",
+    },
+  ],
+  // A long description (text only) of the details of the latest update.
+  latestVersionInfo: "",
+  // App assets (shown in the app store)
+  assets: {
+    path: "app.js",
+    icon: "assets/icon.svg",
+    banner: null,
+  },
+}
