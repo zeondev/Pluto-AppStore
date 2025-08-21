@@ -15,6 +15,7 @@
   compatibleWith: 1.6,
   // The version history of your app (descending).
   versions: [
+    { ver: "2.5.0", cmp: 1.6, date: "2025-08-21T14:26:34.954Z" },
     { ver: "2.0.0", cmp: 1.6, date: "2025-03-30T10:05:23.214Z" },
     {
       ver: "1.0.0",
@@ -23,7 +24,7 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "⚠ This update is NOT backwards compatible with the previous version! Updating is recommended to keep using the app. ⚠\nA MAJOR rework of Pluto Contacts, featuring a fresh new UI, a new cancel dial system, and a fresh new ringtone.\nThis version is still in beta, and more features will come soon.",
+  latestVersionInfo: "Pluto Contacts 2.5.0 update: What's new?\n\n• Added a mute button\n• Redesigned the call screen",
   // App assets (shown in the app store)
   assets: {
     path: "app.js",

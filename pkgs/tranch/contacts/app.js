@@ -160,7 +160,10 @@ export default {
       remove:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>',
       cancel:
-        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-off"><path d="M10.68 13.31a16 16 0 0 0 3.41 2.6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7 2 2 0 0 1 1.72 2v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.42 19.42 0 0 1-3.33-2.67m-2.67-3.34a19.79 19.79 0 0 1-3.07-8.63A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91"/><line x1="2" x2="22" y1="2" y2="22"/></svg>',
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-off-icon lucide-phone-off"><path d="M10.1 13.9a14 14 0 0 0 3.732 2.668 1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2 18 18 0 0 1-12.728-5.272"/><path d="M22 2 2 22"/><path d="M4.76 13.582A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 .244.473"/></svg>',
+      mic: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-icon lucide-mic"><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/></svg>',
+      micOff:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off-icon lucide-mic-off"><path d="M12 19v3"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M16.95 16.95A7 7 0 0 1 5 12v-2"/><path d="M18.89 13.23A7 7 0 0 0 19 12v-2"/><path d="m2 2 20 20"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/></svg>',
     };
 
     let onEndTriggered = false;
@@ -625,14 +628,17 @@ export default {
 
         callState = "receiving a call";
         const callerUsername = call.peer.split("-")[0];
+        const callerInfo = users.find((u) => u.u === callerUsername) ||
+          (await getContacts()).find((c) => c.u === callerUsername) || {
+            u: callerUsername,
+            a: "/assets/default.png",
+          };
 
         let callDataConn = peer.connect(call.peer);
         let callSignalInterval;
         let CSWindow;
         let localAudioStream = null;
-        let callStatusElement = null;
-        let timerDisplayElement = null;
-        let buttonContainerElement = null;
+        let uiElements = {};
         let audioPlayerElement = null;
 
         let cleanupCalled = false;
@@ -643,7 +649,6 @@ export default {
             `Cleaning up received call (${reason}). Current state: ${callState}`
           );
 
-          const previousCallState = callState;
           callState = "standby";
 
           clearInterval(callSignalInterval);
@@ -656,22 +661,18 @@ export default {
 
           if (localAudioStream) {
             localAudioStream.getTracks().forEach((track) => track.stop());
-            console.log("Receiver: Local audio stream stopped.");
             localAudioStream = null;
           }
           if (call) {
-            console.log("Receiver: Closing media connection (call)...");
             call.close();
           }
           if (callDataConn && callDataConn.open) {
-            console.log("Receiver: Closing data connection (callDataConn)...");
             try {
               callDataConn.close();
             } catch (e) {}
             callDataConn = null;
           }
           if (CSWindow && !CSWindow.closed) {
-            console.log("Receiver: Closing call window...");
             CSWindow.close();
             CSWindow = null;
           }
@@ -744,7 +745,6 @@ export default {
           }
         });
 
-        let notificationHideFunc = null;
         callNotification = Notify.show(
           "Pluto Contacts",
           `${callerUsername} is calling...`,
@@ -762,21 +762,20 @@ export default {
 
                 localAudioStream = null;
                 CSWindow = null;
+                let isMuted = false;
 
                 try {
-                  console.log("Attempting to get user media (audio)...");
                   localAudioStream = await navigator.mediaDevices.getUserMedia({
                     video: false,
                     audio: true,
                   });
-                  console.log("Got user media stream.");
 
                   CSWindow = new Win({
                     title: `Audio call with ${callerUsername}`,
                     content: "",
                     pid: Root.PID,
-                    width: 320,
-                    height: 400,
+                    width: 360,
+                    height: 550,
                     onclose: () => {
                       cleanupReceivedCall("Window Closed");
                     },
@@ -784,27 +783,10 @@ export default {
                   windows.push(CSWindow);
                   let CSWindowWrapper = Html.from(
                     CSWindow.window.querySelector(".win-content")
-                  ).styleJs({
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: "20px",
-                    height: "100%",
-                    boxSizing: "border-box",
-                  });
-                  new Html("h2")
-                    .text(callerUsername)
-                    .appendTo(CSWindowWrapper)
-                    .styleJs({ marginBottom: "10px" });
-                  callStatusElement = new Html("p")
-                    .text("Connecting...")
-                    .appendTo(CSWindowWrapper)
-                    .styleJs({ margin: "5px 0 15px 0" });
-                  timerDisplayElement = new Html("p").appendTo(CSWindowWrapper);
-                  buttonContainerElement = new Html("div").appendTo(
-                    CSWindowWrapper
                   );
+
+                  uiElements = createCallWindowUI(CSWindowWrapper, callerInfo);
+                  uiElements.callStatusElement.text("Connecting...");
 
                   console.log("Answering call...");
                   call.answer(localAudioStream);
@@ -815,16 +797,38 @@ export default {
                     if (cleanupCalled || callState === "standby") return;
                     console.log("Received remote stream from:", call.peer);
                     callState = "in call";
-                    if (callStatusElement) callStatusElement.text("Connected");
+                    if (uiElements.callStatusElement)
+                      uiElements.callStatusElement.text("Connected");
                     globalCall = call;
 
-                    if (buttonContainerElement) {
-                      buttonContainerElement.clear();
-                      new Html("button")
-                        .text("End call")
-                        .appendTo(buttonContainerElement)
-                        .styleJs({ marginTop: "10px" })
-                        .on("click", () => cleanupReceivedCall("User Ended"));
+                    if (uiElements.buttonContainerElement) {
+                      uiElements.buttonContainerElement.clear();
+                      const muteButton = new Html("button")
+                        .attr({
+                          title: "Mute/Unmute",
+                          class: "call-btn mute-btn",
+                        })
+                        .appendTo(uiElements.buttonContainerElement);
+                      muteButton.elm.innerHTML = icons.mic; // FIX: Use innerHTML
+                      muteButton.on("click", () => {
+                        isMuted = !isMuted;
+                        if (localAudioStream) {
+                          localAudioStream.getAudioTracks().forEach((t) => {
+                            t.enabled = !isMuted;
+                          });
+                        }
+                        muteButton.elm.innerHTML = isMuted
+                          ? icons.micOff
+                          : icons.mic;
+                      });
+
+                      const endCallButton = new Html("button")
+                        .attr({ title: "End Call", class: "call-btn end-btn" })
+                        .appendTo(uiElements.buttonContainerElement);
+                      endCallButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
+                      endCallButton.on("click", () =>
+                        cleanupReceivedCall("User Ended")
+                      );
                     }
 
                     audioPlayerElement = new Html("audio")
@@ -860,8 +864,10 @@ export default {
                         .toString()
                         .padStart(2, "0");
                       let secs = (elapsed % 60).toString().padStart(2, "0");
-                      if (timerDisplayElement)
-                        timerDisplayElement.text(`${mins}:${secs} elapsed`);
+                      if (uiElements.timerDisplayElement)
+                        uiElements.timerDisplayElement.text(
+                          `${mins}:${secs} elapsed`
+                        );
                     }, 1000);
                   });
 
@@ -913,14 +919,7 @@ export default {
                 if (callDataConn && callDataConn.open) {
                   try {
                     callDataConn.send("decline");
-                    console.log("Receiver: Sent decline signal.");
-                  } catch (e) {
-                    console.warn("Receiver: Failed to send decline signal", e);
-                  }
-                } else {
-                  console.warn(
-                    "Could not send decline, data connection not open/ready."
-                  );
+                  } catch (e) {}
                 }
                 cleanupReceivedCall("User Declined");
               },
@@ -958,9 +957,6 @@ export default {
         if (err.type === "unavailable-id") {
           errorMessage =
             "Call Service Error: ID unavailable. It might be in use or network issues prevent registration. Please wait and retry.";
-          console.warn(
-            "PeerJS: ID unavailable. Potential collision or server issue. Delaying reconnect attempt."
-          );
           if (peer && !peer.destroyed) peer.destroy();
           peer = null;
           shouldRetry = true;
@@ -1253,7 +1249,7 @@ export default {
                   );
                   return;
                 }
-                audioCall(contact.u, contact.id);
+                audioCall(contact);
               })
               .styleJs({
                 padding: "8px",
@@ -1546,7 +1542,129 @@ export default {
       searchInput.on("input", debouncedSearch);
     }
 
-    async function audioCall(name, id, pid = -1) {
+    function createCallWindowUI(wrapper, contact) {
+      wrapper.clear().styleJs({ padding: "0", overflow: "hidden" });
+
+      const fullAvPath =
+        contact.a && contact.a.startsWith("http")
+          ? contact.a
+          : "https://zeon.dev" + (contact.a || "/assets/default.png");
+
+      wrapper.html(`
+            <style>
+                .call-ui-wrapper {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 40px 20px;
+                    box-sizing: border-box;
+                    position: relative; /* For pseudo-element positioning */
+                    overflow: hidden; /* To contain the blurred background */
+                    background-color: var(--surface); /* Fallback color */
+                }
+                .call-ui-wrapper::before {
+                    content: '';
+                    position: absolute;
+                    top: -20px; /* Extend to avoid edge artifacts from blur */
+                    left: -20px;
+                    right: -20px;
+                    bottom: -20px;
+                    background: url('${fullAvPath}') center center / cover;
+                    filter: blur(100px) brightness(0.5); /* Blur and darken for readability */
+                    z-index: 1;
+                }
+                .call-info, .call-controls {
+                    position: relative;
+                    z-index: 2; /* Ensure content is on top of the background */
+                    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+                }
+                .call-info {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    text-align: center;
+                    margin-top: 20px;
+                }
+                .call-avatar {
+                    width: 120px;
+                    height: 120px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    margin-bottom: 20px;
+                    border: 3px solid rgba(255, 255, 255, 0.6);
+                    background-color: var(--surface-container-high);
+                    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                }
+                .call-name {
+                    font-size: 2.2em;
+                    font-weight: 500;
+                    margin: 0 0 5px 0;
+                    color: #fff;
+                }
+                .call-status, .call-timer {
+                    font-size: 1.1em;
+                    margin: 2px 0;
+                    color: #eee;
+                    opacity: 0.9;
+                }
+                .call-controls {
+                    display: flex;
+                    justify-content: center;
+                    gap: 30px;
+                    width: 100%;
+                    padding-bottom: 20px;
+                }
+                .call-btn {
+                    width: 64px;
+                    height: 64px;
+                    border-radius: 50%;
+                    border: none;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    transition: transform 0.1s ease-out;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+                }
+                .call-btn:active {
+                  transform: scale(0.95);
+                }
+                .call-btn svg {
+                    width: 32px;
+                    height: 32px;
+                }
+                .mute-btn {
+                    background-color: rgba(255,255,255,0.2);
+                    color: #fff;
+                }
+                .end-btn {
+                    background-color: var(--negative);
+                    color: var(--on-error);
+                }
+            </style>
+            <div class="call-ui-wrapper">
+                <div class="call-info">
+                    <img class="call-avatar" src="${fullAvPath}" alt="Avatar">
+                    <h1 class="call-name">${contact.u}</h1>
+                    <p class="call-status"></p>
+                    <p class="call-timer"></p>
+                </div>
+                <div class="call-controls">
+                </div>
+            </div>
+        `);
+
+      return {
+        callStatusElement: wrapper.qs(".call-status"),
+        timerDisplayElement: wrapper.qs(".call-timer"),
+        buttonContainerElement: wrapper.qs(".call-controls"),
+      };
+    }
+
+    async function audioCall(contact, pid = -1) {
+      const { u: name, id, a: avatar } = contact;
       console.log(`Initiating audio call to ${name} (ID: ${id})`);
 
       if (name == userData.username) {
@@ -1559,16 +1677,13 @@ export default {
           "Pluto Contacts",
           "Call service not ready. Please wait or restart."
         );
-        if (!peer || peer.destroyed) {
-          setupPeer();
-        } else if (peer.disconnected) {
+        if (!peer || peer.destroyed) setupPeer();
+        else if (peer.disconnected)
           try {
             peer.reconnect();
           } catch (e) {
-            console.warn("Reconnect failed on call initiation", e);
             setupPeer();
           }
-        }
         if (pid > -1) {
           try {
             Root.Core.processList[pid]?.proc.send({
@@ -1626,10 +1741,9 @@ export default {
       let cleanupCalled = false;
       let timeoutInt = null;
       let elapsedInt = null;
-      let callStatusElement = null;
-      let timerDisplayElement = null;
-      let buttonContainerElement = null;
+      let uiElements = {};
       let audioPlayerElement = null;
+      let isMuted = false;
 
       const peerID = `${name}-${String(id)}`;
 
@@ -1639,36 +1753,27 @@ export default {
         console.log(
           `Cleaning up initiated call (${reason}). Current state: ${callState}`
         );
-        const previousCallState = callState;
         callState = "standby";
 
         clearInterval(timeoutInt);
         clearInterval(elapsedInt);
-        if (onDecline) {
-          document.removeEventListener("call-decline", onDecline);
-        }
+        if (onDecline) document.removeEventListener("call-decline", onDecline);
 
         if (localAudioStream) {
           localAudioStream.getTracks().forEach((track) => track.stop());
-          console.log("Caller: Local audio stream stopped.");
           localAudioStream = null;
         }
         if (call) {
-          console.log("Caller: Closing media connection (call)...");
           call.close();
           call = null;
         }
         if (conn && conn.open) {
-          console.log("Caller: Closing data connection (conn)...");
           try {
             conn.close();
-          } catch (e) {
-            console.warn("Caller: Error closing data connection:", e);
-          }
+          } catch (e) {}
           conn = null;
         }
         if (CSWindow && !CSWindow.closed) {
-          console.log("Caller: Closing call window...");
           CSWindow.close();
           CSWindow = null;
         }
@@ -1678,115 +1783,55 @@ export default {
           audioPlayerElement.elm.remove();
           audioPlayerElement = null;
         }
-        if (globalCall === call) {
-          globalCall = null;
-        }
+        if (globalCall === call) globalCall = null;
 
         if (pid > -1) {
           let feedbackMsg = `Call ended (${reason}).`;
-          if (reason === "User Canceled" || reason === "Window Closed")
-            feedbackMsg = "Call canceled by you.";
-          else if (reason === "Declined")
-            feedbackMsg = "Call declined by recipient.";
-          else if (reason === "Busy") feedbackMsg = "Recipient is busy.";
-          else if (reason === "Timeout")
-            feedbackMsg = "Recipient did not answer.";
-          else if (reason === "Remote Closed")
-            feedbackMsg = "Call ended by recipient.";
-          else if (
-            reason === "Media Error" ||
-            reason === "Data Error" ||
-            reason === "Data Closed During Dial" ||
-            reason === "Connection Failed"
-          )
-            feedbackMsg = `Call failed (${reason}).`;
-          else if (
-            reason === "Permission Denied" ||
-            reason === "No Microphone" ||
-            reason === "getUserMedia Failed" ||
-            reason === "Mic Busy"
-          )
-            feedbackMsg = "Call failed: Could not access microphone.";
-          else if (reason === "Peer Unavailable")
-            feedbackMsg = "Call failed: Recipient could not be reached.";
-
           if (Root.Core.processList[pid]?.proc) {
             try {
               Root.Core.processList[pid].proc.send({
                 type: "function",
                 content: feedbackMsg,
               });
-            } catch (e) {
-              console.warn("Failed to send Helper AI feedback:", e);
-            }
-          } else {
-            console.warn(
-              "Helper AI process PID",
-              pid,
-              "not found for sending feedback."
-            );
+            } catch (e) {}
           }
         }
         console.log("Caller: Call cleanup finished.");
       };
 
       try {
-        console.log("Caller: Requesting user media (audio)...");
         localAudioStream = await navigator.mediaDevices.getUserMedia({
           video: false,
           audio: true,
         });
-        console.log("Caller: User media obtained successfully.");
 
         CSWindow = new Win({
           title: `Calling ${name}`,
           content: "",
           pid: Root.PID,
-          width: 320,
-          height: 400,
+          width: 360,
+          height: 550,
           onclose: () => {
             cleanupCall("Window Closed");
           },
         });
         windows.push(CSWindow);
-
         let CSWindowWrapper = Html.from(
           CSWindow.window.querySelector(".win-content")
-        ).styleJs({
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "20px",
-          height: "100%",
-          boxSizing: "border-box",
-        });
-        new Html("h2")
-          .text(name)
-          .appendTo(CSWindowWrapper)
-          .styleJs({ marginBottom: "10px" });
-        callStatusElement = new Html("p")
-          .text("Dialing...")
-          .appendTo(CSWindowWrapper)
-          .styleJs({ margin: "5px 0 15px 0" });
-        timerDisplayElement = new Html("p").appendTo(CSWindowWrapper);
-        buttonContainerElement = new Html("div").appendTo(CSWindowWrapper);
+        );
+
+        uiElements = createCallWindowUI(CSWindowWrapper, contact);
+        uiElements.callStatusElement.text("Dialing...");
 
         const cancelButton = new Html("button")
-          .html(icons.cancel + " Cancel")
-          .appendTo(buttonContainerElement)
-          .styleJs({
-            background: "var(--error)",
-            color: "var(--on-error)",
-            marginTop: "10px",
-          })
-          .classOn("flex-list", "row", "gap")
-          .on("click", () => {
-            cleanupCall("User Canceled");
-            if (onDecline) {
-              document.removeEventListener("call-decline", onDecline);
-            }
-          });
+          .attr({ title: "Cancel Call", class: "call-btn end-btn" })
+          .appendTo(uiElements.buttonContainerElement);
+        cancelButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
+        cancelButton.on("click", () => {
+          cleanupCall("User Canceled");
+          if (onDecline)
+            document.removeEventListener("call-decline", onDecline);
+        });
 
         timeoutSeconds = 60;
         timeoutInt = setInterval(() => {
@@ -1795,54 +1840,40 @@ export default {
             return;
           }
           timeoutSeconds--;
-          if (callStatusElement)
-            callStatusElement.text(`Ringing... (${timeoutSeconds}s)`);
+          if (uiElements.callStatusElement)
+            uiElements.callStatusElement.text(
+              `Ringing... (${timeoutSeconds}s)`
+            );
           if (timeoutSeconds <= 0) {
             Notify.show("Pluto Contacts", `${name} did not answer.`);
             cleanupCall("Timeout");
           }
         }, 1000);
 
-        console.log(`Caller: Establishing data connection to: ${peerID}`);
         conn = peer.connect(peerID, { reliable: true });
 
         onDecline = () => {
           if (cleanupCalled) return;
           clearInterval(timeoutInt);
           Notify.show("Pluto Contacts", name + " declined your call");
-          if (pid > -1) {
-            if (Root.Core.processList[pid]?.proc) {
-              try {
-                Root.Core.processList[pid].proc.send({
-                  type: "function",
-                  content: "Person declined the call",
-                });
-              } catch (e) {}
-            }
-          }
           cleanupCall("Declined");
           document.removeEventListener("call-decline", onDecline);
         };
         document.addEventListener("call-decline", onDecline);
 
         conn.on("open", () => {
-          console.log("Caller: Data connection open with:", peerID);
           if (callState !== "dialing" || cleanupCalled) {
-            console.log(
-              "Caller: State changed or cleanup called before data open processed fully. Aborting call initiation."
-            );
             cleanupCall("Aborted Pre-Media");
             return;
           }
 
-          if (callStatusElement) callStatusElement.text("Ringing...");
+          if (uiElements.callStatusElement)
+            uiElements.callStatusElement.text("Ringing...");
 
-          console.log("Caller: Initiating media call to:", peerID);
           call = peer.call(peerID, localAudioStream);
           globalCall = call;
 
           if (!call) {
-            console.error("Caller: peer.call() failed immediately.");
             Notify.show(
               "Pluto Contacts",
               `Failed to initiate call to ${name}.`
@@ -1853,24 +1884,37 @@ export default {
 
           call.on("stream", (remoteStream) => {
             currentCall = call;
-            console.log("Caller: Received remote stream from:", peerID);
             if (callState === "standby" || cleanupCalled) return;
-
-            if (onDecline) {
+            if (onDecline)
               document.removeEventListener("call-decline", onDecline);
-            }
 
             callState = "in call";
             clearInterval(timeoutInt);
-            if (callStatusElement) callStatusElement.text("Connected");
+            if (uiElements.callStatusElement)
+              uiElements.callStatusElement.text("Connected");
 
-            if (buttonContainerElement) {
-              buttonContainerElement.clear();
-              new Html("button")
-                .text("End call")
-                .appendTo(buttonContainerElement)
-                .styleJs({ marginTop: "10px" })
-                .on("click", () => cleanupCall("User Ended"));
+            if (uiElements.buttonContainerElement) {
+              uiElements.buttonContainerElement.clear();
+
+              const muteButton = new Html("button")
+                .attr({ title: "Mute/Unmute", class: "call-btn mute-btn" })
+                .appendTo(uiElements.buttonContainerElement);
+              muteButton.elm.innerHTML = icons.mic; // FIX: Use innerHTML
+              muteButton.on("click", () => {
+                isMuted = !isMuted;
+                if (localAudioStream) {
+                  localAudioStream.getAudioTracks().forEach((t) => {
+                    t.enabled = !isMuted;
+                  });
+                }
+                muteButton.elm.innerHTML = isMuted ? icons.micOff : icons.mic;
+              });
+
+              const endCallButton = new Html("button")
+                .attr({ title: "End Call", class: "call-btn end-btn" })
+                .appendTo(uiElements.buttonContainerElement);
+              endCallButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
+              endCallButton.on("click", () => cleanupCall("User Ended"));
             }
 
             audioPlayerElement = new Html("audio")
@@ -1883,7 +1927,6 @@ export default {
                 .play()
                 .catch((e) => console.warn("Audio play failed:", e));
             } catch (e) {
-              console.error("Error setting srcObject for remote audio:", e);
               Notify.show("Pluto Contacts", "Error playing remote audio.");
               cleanupCall("Audio Playback Error");
               return;
@@ -1900,17 +1943,15 @@ export default {
                 .toString()
                 .padStart(2, "0");
               let secs = (elapsed % 60).toString().padStart(2, "0");
-              if (timerDisplayElement)
-                timerDisplayElement.text(`${mins}:${secs} elapsed`);
+              if (uiElements.timerDisplayElement)
+                uiElements.timerDisplayElement.text(`${mins}:${secs} elapsed`);
             }, 1000);
           });
 
           call.on("close", () => {
-            if (onDecline) {
+            if (onDecline)
               document.removeEventListener("call-decline", onDecline);
-            }
             if (!cleanupCalled) {
-              console.log("Caller: Media call closed by remote peer:", peerID);
               Notify.show("Pluto Contacts", `Call with ${name} ended.`);
               cleanupCall("Remote Closed");
             }
@@ -1918,7 +1959,6 @@ export default {
 
           call.on("error", (err) => {
             if (!cleanupCalled) {
-              console.error("Caller: Media call error:", err);
               Notify.show(
                 "Pluto Contacts",
                 `Media call error: ${err.message || err.type || "Unknown"}`
@@ -1929,62 +1969,37 @@ export default {
         });
 
         conn.on("data", (data) => {
-          console.log("Caller: Received data:", data, "from:", peerID);
           if (callState === "standby" || cleanupCalled) return;
-
-          if (data === "decline") {
-            cleanupCall("Declined");
-          } else if (data === "busy") {
+          if (data === "decline") cleanupCall("Declined");
+          else if (data === "busy") {
             Notify.show("Pluto Contacts", `${name} is busy.`);
             cleanupCall("Busy");
           } else if (data === "recvRequest") {
-            console.log("Caller: Ringing acknowledgement received from:", name);
-            if (callState === "dialing" && callStatusElement)
-              callStatusElement.text("Ringing...");
+            if (callState === "dialing" && uiElements.callStatusElement)
+              uiElements.callStatusElement.text("Ringing...");
             timeoutSeconds = 30;
-            console.log("Caller: Ring timeout reset based on recvRequest.");
           }
         });
 
         conn.on("close", () => {
           if (!cleanupCalled) {
-            console.log("Caller: Data connection closed with:", peerID);
             if (callState === "dialing" || callState === "connecting") {
               Notify.show(
                 "Pluto Contacts",
                 `Connection lost while trying to reach ${name}.`
               );
               cleanupCall("Data Closed During Dial");
-            } else if (callState === "in call") {
-              console.warn(
-                "Caller: Data connection closed while in call. Media connection should handle call end."
-              );
             }
           }
         });
 
         conn.on("error", (err) => {
           if (!cleanupCalled) {
-            console.error("Caller: Data connection error:", err);
-            if (callState === "dialing" || callState === "connecting") {
-              Notify.show(
-                "Pluto Contacts",
-                `Connection error: ${
-                  err.type || "Unknown"
-                }. Cannot reach ${name}.`
-              );
-              cleanupCall("Data Error");
-            } else if (callState === "in call") {
-              console.warn(
-                `Caller: Data connection error (${err.type}) while in call.`
-              );
-            } else {
-              Notify.show(
-                "Pluto Contacts",
-                `Connection error with ${name}: ${err.type || "Unknown"}`
-              );
-              cleanupCall("Data Error");
-            }
+            Notify.show(
+              "Pluto Contacts",
+              `Connection error with ${name}: ${err.type || "Unknown"}`
+            );
+            cleanupCall("Data Error");
           }
         });
       } catch (err) {
@@ -1992,7 +2007,6 @@ export default {
         let reason = "Initiation Failed";
         let message = `Failed to start call: ${err.message || "Unknown error"}`;
         let persist = false;
-
         if (
           err.name === "NotAllowedError" ||
           err.name === "PermissionDeniedError"
@@ -2192,8 +2206,26 @@ export default {
               const contactNameToCall = contactNameArg.trim();
               const contactIdToCall = contactIdArg;
 
+              const allContacts = await getContacts();
+              let contactToCall = allContacts.find(
+                (c) => String(c.id) === String(contactIdToCall)
+              );
+
+              if (!contactToCall) {
+                contactToCall = users.find(
+                  (u) => String(u.id) === String(contactIdToCall)
+                );
+              }
+
+              if (!contactToCall) {
+                sendReply(
+                  `Call failed: Contact with name "${contactNameToCall}" and ID "${contactIdToCall}" not found.`
+                );
+                return;
+              }
+
               sendUpdate(`Initiating audio call with ${contactNameToCall}...`);
-              audioCall(contactNameToCall, contactIdToCall, m.pid);
+              audioCall(contactToCall, m.pid);
               break;
 
             default:
