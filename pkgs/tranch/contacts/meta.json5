@@ -15,6 +15,7 @@
   compatibleWith: 1.6,
   // The version history of your app (descending).
   versions: [
+    { ver: "3.0.0", cmp: 1.6, date: "2025-08-22T12:22:41.949Z" },
     { ver: "2.5.0", cmp: 1.6, date: "2025-08-21T14:26:34.954Z" },
     { ver: "2.0.0", cmp: 1.6, date: "2025-03-30T10:05:23.214Z" },
     {
@@ -24,7 +25,7 @@
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "Pluto Contacts 2.5.0 update: What's new?\n\n• Added a mute button\n• Redesigned the call screen",
+  latestVersionInfo: "Pluto Contacts 3.0.0 update: What's new?\n\n• Video call with your contacts! \n• Redesigned the call notification",
   // App assets (shown in the app store)
   assets: {
     path: "app.js",
