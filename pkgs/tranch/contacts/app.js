@@ -154,6 +154,8 @@ export default {
       tags: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-tags"><path d="M9 5H2v7l6.29 6.29c.94.94 2.48.94 3.42 0l3.58-3.58c.94-.94.94-2.48 0-3.42L9 5Z"/><path d="M6 9.01V9"/><path d="m15 5 6.3 6.3a2.4 2.4 0 0 1 0 3.4L17 19"/></svg>',
       video:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/></svg>',
+      videoOff:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-video-off"><path d="M10.66 6H14a2 2 0 0 1 2 2v2.34l1 1L22 8v8"/><path d="m2 2 20 20"/><path d="M14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h1.34l1 1"/><path d="M8 12.34V18l-6-4 2.22-1.48"/></svg>',
       audio:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-phone-call"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/><path d="M14.05 2a9 9 0 0 1 8 7.94"/><path d="M14.05 6A5 5 0 0 1 18 10"/></svg>',
       add: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus"><path d="M5 12h14"/><path d="M12 5v14"/></svg>',
@@ -164,6 +166,8 @@ export default {
       mic: '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-icon lucide-mic"><path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/></svg>',
       micOff:
         '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-mic-off-icon lucide-mic-off"><path d="M12 19v3"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M16.95 16.95A7 7 0 0 1 5 12v-2"/><path d="M18.89 13.23A7 7 0 0 0 19 12v-2"/><path d="m2 2 20 20"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/></svg>',
+      chevronUp:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up-icon lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>',
     };
 
     let onEndTriggered = false;
@@ -329,6 +333,30 @@ export default {
     }, 2000);
 
     const CONTACTS_PATH = "Registry/contactsList";
+    const SETTINGS_PATH = "Registry/contactsCallSettings";
+
+    async function saveCallPreferences(prefs) {
+      try {
+        await vfs.writeFile(SETTINGS_PATH, JSON.stringify(prefs));
+        console.log("Saved call preferences:", prefs);
+      } catch (e) {
+        console.error("Failed to save call preferences:", e);
+      }
+    }
+
+    async function loadCallPreferences() {
+      try {
+        if (await vfs.exists(SETTINGS_PATH)) {
+          const settingsJson = await vfs.readFile(SETTINGS_PATH);
+          const prefs = JSON.parse(settingsJson);
+          console.log("Loaded call preferences:", prefs);
+          return prefs;
+        }
+      } catch (e) {
+        console.error("Failed to load call preferences:", e);
+      }
+      return {}; // Return empty object if not found or error
+    }
 
     async function getContacts() {
       try {
@@ -464,6 +492,282 @@ export default {
       }
     }
 
+    async function createAndShowIncomingCallOverlay(
+      callerInfo,
+      callType,
+      onAccept,
+      onDecline,
+      streamRef
+    ) {
+      document.querySelector(".facetime-call-overlay")?.remove();
+
+      const overlay = new Html("div")
+        .classOn("facetime-call-overlay")
+        .appendTo("body");
+
+      const previewContainer = new Html("div")
+        .classOn("facetime-preview-container")
+        .appendTo(overlay);
+      const videoPreview = new Html("video")
+        .classOn("facetime-preview-video")
+        .attr({ autoplay: true, muted: true, playsinline: true })
+        .appendTo(previewContainer);
+      const placeholder = new Html("div")
+        .classOn("facetime-preview-placeholder")
+        .text(
+          callType === "video" ? "Camera starting..." : "Incoming Audio Call"
+        )
+        .appendTo(previewContainer);
+
+      const controlsContainer = new Html("div")
+        .classOn("facetime-controls-container")
+        .appendTo(overlay);
+
+      const style = new Html("style")
+        .text(
+          `
+        .facetime-call-overlay {
+            position: fixed; bottom: 54px; right: 20px; width: 380px;
+            background-color: var(--root);
+            color: var(--on-surface, white); border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4); z-index: 10001;
+            overflow: hidden; transform: scale(0.9); opacity: 0;
+            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease;
+            display: flex; flex-direction: column;
+        }
+        .facetime-preview-container {
+            position: relative; height: 214px; /* 16:9 aspect ratio for 380px width */
+            background-color: var(--unfocused);
+            display: flex; align-items: center; justify-content: center;
+        }
+        .facetime-preview-video {
+            width: 100%; height: 100%; object-fit: cover;
+            transform: scaleX(-1); display: none;
+        }
+        .facetime-preview-placeholder { color: #888; }
+        .facetime-controls-container {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 20px; height: 90px; box-sizing: border-box;
+        }
+        .facetime-caller-info { display: flex; align-items: center; gap: 15px; }
+        .facetime-caller-info img { width: 50px; height: 50px; border-radius: 50%; background-color: #555; }
+        .facetime-caller-info h3 { margin: 0; font-size: 1.1em; font-weight: 500; }
+        .facetime-caller-info p { margin: 2px 0 0 0; font-size: 0.9em; opacity: 0.8; }
+        .facetime-actions { display: flex; gap: 8px; align-items: center; }
+        .facetime-actions button {
+            width: 44px; height: 44px; border-radius: 50%; border: none; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; padding: 0;
+            transition: transform 0.1s ease; color: white;
+        }
+        .facetime-actions button:active { transform: scale(0.9); }
+        .facetime-decline { background-color: #ff3b30; }
+        .facetime-accept-group { position: relative; display: flex; background-color: #34c759; border-radius: 22px; }
+        .facetime-accept { background: none; }
+        .facetime-accept-options { background: none; width: 30px; border-left: 1px solid rgba(255,255,255,0.3); }
+        .facetime-device-menu {
+            display: none; position: absolute; bottom: 55px; right: 0;
+            background-color: var(--root); backdrop-filter: blur(10px);
+            border-radius: 8px; padding: 10px; width: 250px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .facetime-device-menu select { width: 100%; }
+      `
+        )
+        .appendTo(overlay);
+
+      const callerInfoDiv = new Html("div")
+        .classOn("facetime-caller-info")
+        .appendTo(controlsContainer);
+      const avatarUrl =
+        callerInfo.a && callerInfo.a.startsWith("http")
+          ? callerInfo.a
+          : "https://zeon.dev" + (callerInfo.a || "/assets/default.png");
+      new Html("img").attr({ src: avatarUrl }).appendTo(callerInfoDiv);
+      const infoText = new Html("div").appendTo(callerInfoDiv);
+      new Html("h3").text(callerInfo.u).appendTo(infoText);
+      new Html("p")
+        .text(`Pluto ${callType.charAt(0).toUpperCase() + callType.slice(1)}`)
+        .appendTo(infoText);
+
+      const actions = new Html("div")
+        .classOn("facetime-actions")
+        .appendTo(controlsContainer);
+      const declineButton = new Html("button")
+        .classOn("facetime-decline")
+        .html(icons.cancel)
+        .appendTo(actions);
+
+      const acceptGroup = new Html("div")
+        .classOn("facetime-accept-group")
+        .appendTo(actions);
+      const acceptButton = new Html("button")
+        .classOn("facetime-accept")
+        .html(callType === "video" ? icons.video : icons.audio)
+        .appendTo(acceptGroup);
+      const optionsButton = new Html("button")
+        .classOn("facetime-accept-options")
+        .html(icons["chevronUp"])
+        .appendTo(acceptGroup);
+
+      const deviceMenu = new Html("div")
+        .classOn("facetime-device-menu")
+        .appendTo(acceptGroup);
+      new Html("label").text("Microphone").appendTo(deviceMenu);
+      const audioSelect = new Html("select").appendTo(deviceMenu);
+      let videoSelect;
+      if (callType === "video") {
+        new Html("label").text("Camera").appendTo(deviceMenu);
+        videoSelect = new Html("select").appendTo(deviceMenu);
+      }
+
+      const prefs = await loadCallPreferences();
+      try {
+        const getStream = async () => {
+          if (callType === "video") {
+            const videoConstraint = prefs.videoDeviceId
+              ? { deviceId: { exact: prefs.videoDeviceId } }
+              : true;
+            streamRef.stream = await navigator.mediaDevices.getUserMedia({
+              video: videoConstraint,
+            });
+            videoPreview.elm.srcObject = streamRef.stream;
+            videoPreview.styleJs({ display: "block" });
+            placeholder.styleJs({ display: "none" });
+          }
+        };
+        await getStream();
+
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        devices
+          .filter((d) => d.kind === "audioinput")
+          .forEach((d) =>
+            new Html("option")
+              .attr({ value: d.deviceId })
+              .text(d.label || `Mic ${audioSelect.elm.options.length + 1}`)
+              .appendTo(audioSelect)
+          );
+        if (videoSelect) {
+          devices
+            .filter((d) => d.kind === "videoinput")
+            .forEach((d) =>
+              new Html("option")
+                .attr({ value: d.deviceId })
+                .text(d.label || `Cam ${videoSelect.elm.options.length + 1}`)
+                .appendTo(videoSelect)
+            );
+          if (prefs.videoDeviceId) videoSelect.elm.value = prefs.videoDeviceId;
+        }
+        if (prefs.audioDeviceId) audioSelect.elm.value = prefs.audioDeviceId;
+      } catch (err) {
+        console.warn(
+          "Could not get camera for preview or enumerate devices:",
+          err
+        );
+        placeholder.text("Camera not available.");
+      }
+
+      async function updatePreviewCamera() {
+        if (callType !== "video" || !videoSelect) return;
+
+        if (streamRef.stream) {
+          streamRef.stream.getTracks().forEach((track) => track.stop());
+        }
+
+        const videoDeviceId = videoSelect.getValue();
+        console.log("Switching camera preview to device:", videoDeviceId);
+
+        placeholder.text("Switching camera...").styleJs({ display: "block" });
+        videoPreview.styleJs({ display: "none" });
+        videoPreview.elm.srcObject = null;
+
+        try {
+          const constraints = {
+            video: videoDeviceId
+              ? { deviceId: { exact: videoDeviceId } }
+              : true,
+          };
+          streamRef.stream = await navigator.mediaDevices.getUserMedia(
+            constraints
+          );
+
+          videoPreview.elm.srcObject = streamRef.stream;
+          await videoPreview.elm.play();
+
+          videoPreview.styleJs({ display: "block" });
+          placeholder.styleJs({ display: "none" });
+        } catch (err) {
+          console.error("Failed to switch camera for preview:", err);
+          placeholder.text("Failed to start camera.");
+          videoPreview.elm.srcObject = null;
+          if (streamRef.stream) {
+            streamRef.stream.getTracks().forEach((track) => track.stop());
+            streamRef.stream = null;
+          }
+        }
+      }
+
+      if (videoSelect) {
+        videoSelect.on("change", updatePreviewCamera);
+      }
+
+      setTimeout(
+        () => overlay.styleJs({ transform: "scale(1)", opacity: 1 }),
+        10
+      );
+      const ringtone = new Html("audio")
+        .attr({
+          src: "https://prismatic-fairy-9a69bd.netlify.app/assets/Pluto-Contacts-Ringtone.wav",
+          autoplay: true,
+          loop: true,
+        })
+        .appendTo(overlay);
+
+      const destroy = () => {
+        ringtone.elm.pause();
+        if (streamRef.stream) {
+          streamRef.stream.getTracks().forEach((track) => track.stop());
+          streamRef.stream = null;
+        }
+        overlay.cleanup();
+      };
+
+      optionsButton.on("click", (e) => {
+        e.stopPropagation();
+        deviceMenu.styleJs({
+          display:
+            window.getComputedStyle(deviceMenu.elm).display === "block"
+              ? "none"
+              : "block",
+        });
+      });
+      document.body.addEventListener("click", (e) => {
+        if (
+          window.getComputedStyle(deviceMenu.elm).display === "block" &&
+          !acceptGroup.elm.contains(e.target)
+        ) {
+          deviceMenu.styleJs({ display: "none" });
+        }
+      });
+
+      declineButton.on("click", () => {
+        destroy();
+        onDecline();
+      });
+
+      acceptButton.on("click", async () => {
+        const audioId = audioSelect.getValue();
+        const videoId = videoSelect ? videoSelect.getValue() : null;
+        await saveCallPreferences({
+          audioDeviceId: audioId,
+          videoDeviceId: videoId,
+        });
+        destroy();
+        onAccept(audioId, videoId);
+      });
+
+      return { destroy };
+    }
+
     function setupPeer() {
       if (typeof _ === "undefined" || !_) {
         console.error(
@@ -569,6 +873,14 @@ export default {
             "from:",
             conn.peer
           );
+          if (data === "cancel") {
+            document.dispatchEvent(
+              new CustomEvent("call-cancelled", {
+                detail: { peer: conn.peer },
+              })
+            );
+            return;
+          }
           if (data == "decline") {
             document.dispatchEvent(new CustomEvent("call-decline"));
           }
@@ -634,14 +946,20 @@ export default {
             a: "/assets/default.png",
           };
 
+        const callType = call.metadata?.type === "video" ? "video" : "audio";
+
         let callDataConn = peer.connect(call.peer);
         let callSignalInterval;
         let CSWindow;
-        let localAudioStream = null;
+        let localStream = null;
+        let localPreviewStream = null;
         let uiElements = {};
         let audioPlayerElement = null;
+        let callOverlay;
 
         let cleanupCalled = false;
+        let handleCancelEvent;
+
         const cleanupReceivedCall = (reason) => {
           if (cleanupCalled) return;
           cleanupCalled = true;
@@ -649,19 +967,29 @@ export default {
             `Cleaning up received call (${reason}). Current state: ${callState}`
           );
 
-          callState = "standby";
+          document.removeEventListener("call-cancelled", handleCancelEvent);
 
+          callState = "standby";
           clearInterval(callSignalInterval);
 
-          if (callNotification && callNotification.hide) {
-            console.log("Hiding incoming call notification.");
-            callNotification.hide();
-            callNotification = null;
+          const existingOverlay = document.querySelector(
+            ".facetime-call-overlay"
+          );
+          if (existingOverlay) {
+            console.log("Found and removing overlay from DOM.");
+            const ringtone = existingOverlay.querySelector("audio");
+            if (ringtone) ringtone.pause();
+            existingOverlay.remove();
           }
+          callOverlay = null;
 
-          if (localAudioStream) {
-            localAudioStream.getTracks().forEach((track) => track.stop());
-            localAudioStream = null;
+          if (localPreviewStream) {
+            localPreviewStream.getTracks().forEach((track) => track.stop());
+            localPreviewStream = null;
+          }
+          if (localStream) {
+            localStream.getTracks().forEach((track) => track.stop());
+            localStream = null;
           }
           if (call) {
             call.close();
@@ -679,12 +1007,24 @@ export default {
           windows = windows.filter((w) => w !== CSWindow);
 
           if (audioPlayerElement) {
-            audioPlayerElement.remove();
+            audioPlayerElement.cleanup();
             audioPlayerElement = null;
           }
 
           console.log("Receiver: Call cleanup finished.");
         };
+
+        handleCancelEvent = (event) => {
+          if (
+            event.detail.peer === call.peer &&
+            callState === "receiving a call"
+          ) {
+            Notify.show("Pluto Contacts", "Caller cancelled the call.");
+            cleanupReceivedCall("Caller Cancelled");
+          }
+        };
+
+        document.addEventListener("call-cancelled", handleCancelEvent);
 
         callDataConn.on("open", () => {
           console.log(
@@ -732,221 +1072,251 @@ export default {
           );
           clearInterval(callSignalInterval);
           if (callState === "receiving a call" && !cleanupCalled) {
-            Notify.show("Pluto Contacts", "Caller hung up before connection.");
+            Notify.show(
+              "Pluto Contacts",
+              `You missed a call from ${callerUsername}.`
+            );
             cleanupReceivedCall("Data Closed Before Answer");
           }
         });
         callDataConn.on("data", (data) => {
           console.log("Receiver: Received data via callDataConn:", data);
-          if (data === "cancel" && callState === "receiving a call") {
-            console.log("Receiver: Caller cancelled the call.");
-            Notify.show("Pluto Contacts", "Caller cancelled the call.");
-            cleanupReceivedCall("Caller Cancelled");
-          }
         });
 
-        callNotification = Notify.show(
-          "Pluto Contacts",
-          `${callerUsername} is calling...`,
-          null,
-          [
-            {
-              text: "Accept",
-              type: "primary",
-              callback: async () => {
-                if (cleanupCalled || callState !== "receiving a call") return;
+        const onAcceptCallback = async (selectedAudioId, selectedVideoId) => {
+          if (cleanupCalled || callState !== "receiving a call") return;
 
-                clearInterval(callSignalInterval);
-                console.log("User accepted call from", call.peer);
-                callState = "connecting";
+          clearInterval(callSignalInterval);
+          console.log("User accepted call from", call.peer, "with devices:", {
+            audio: selectedAudioId,
+            video: selectedVideoId,
+          });
+          callState = "connecting";
 
-                localAudioStream = null;
-                CSWindow = null;
-                let isMuted = false;
+          localStream = null;
+          CSWindow = null;
+          let isMuted = false;
+          let isCameraOff = false;
+          const mediaConstraints = {
+            audio: selectedAudioId
+              ? { deviceId: { exact: selectedAudioId } }
+              : true,
+            video:
+              callType === "video"
+                ? selectedVideoId
+                  ? { deviceId: { exact: selectedVideoId } }
+                  : true
+                : false,
+          };
 
-                try {
-                  localAudioStream = await navigator.mediaDevices.getUserMedia({
-                    video: false,
-                    audio: true,
-                  });
+          try {
+            localStream = await navigator.mediaDevices.getUserMedia(
+              mediaConstraints
+            );
 
-                  CSWindow = new Win({
-                    title: `Audio call with ${callerUsername}`,
-                    content: "",
-                    pid: Root.PID,
-                    width: 360,
-                    height: 550,
-                    onclose: () => {
-                      cleanupReceivedCall("Window Closed");
-                    },
-                  });
-                  windows.push(CSWindow);
-                  let CSWindowWrapper = Html.from(
-                    CSWindow.window.querySelector(".win-content")
-                  );
+            CSWindow = new Win({
+              title: `${
+                callType === "video" ? "Video" : "Audio"
+              } call with ${callerUsername}`,
+              content: "",
+              pid: Root.PID,
+              width: callType === "video" ? 854 : 360,
+              height: callType === "video" ? 480 : 550,
+              onclose: () => {
+                cleanupReceivedCall("Window Closed");
+              },
+            });
+            windows.push(CSWindow);
+            let CSWindowWrapper = Html.from(
+              CSWindow.window.querySelector(".win-content")
+            );
 
-                  uiElements = createCallWindowUI(CSWindowWrapper, callerInfo);
-                  uiElements.callStatusElement.text("Connecting...");
+            uiElements = createCallWindowUI(
+              CSWindowWrapper,
+              callerInfo,
+              callType
+            );
+            uiElements.callStatusElement.text("Connecting...");
+            if (callType === "video" && uiElements.localVideoElement?.elm) {
+              uiElements.localVideoElement.elm.srcObject = localStream;
+            }
 
-                  console.log("Answering call...");
-                  call.answer(localAudioStream);
+            console.log("Answering call...");
+            call.answer(localStream);
 
-                  let elapsedInt = null;
-                  call.on("stream", (remoteStream) => {
-                    currentCall = call;
-                    if (cleanupCalled || callState === "standby") return;
-                    console.log("Received remote stream from:", call.peer);
-                    callState = "in call";
-                    if (uiElements.callStatusElement)
-                      uiElements.callStatusElement.text("Connected");
-                    globalCall = call;
+            let elapsedInt = null;
+            call.on("stream", (remoteStream) => {
+              currentCall = call;
+              if (cleanupCalled || callState === "standby") return;
+              console.log("Received remote stream from:", call.peer);
+              callState = "in call";
+              if (uiElements.callStatusElement)
+                uiElements.callStatusElement.text("Connected");
+              globalCall = call;
 
-                    if (uiElements.buttonContainerElement) {
-                      uiElements.buttonContainerElement.clear();
-                      const muteButton = new Html("button")
-                        .attr({
-                          title: "Mute/Unmute",
-                          class: "call-btn mute-btn",
-                        })
-                        .appendTo(uiElements.buttonContainerElement);
-                      muteButton.elm.innerHTML = icons.mic; // FIX: Use innerHTML
-                      muteButton.on("click", () => {
-                        isMuted = !isMuted;
-                        if (localAudioStream) {
-                          localAudioStream.getAudioTracks().forEach((t) => {
-                            t.enabled = !isMuted;
-                          });
-                        }
-                        muteButton.elm.innerHTML = isMuted
-                          ? icons.micOff
-                          : icons.mic;
-                      });
-
-                      const endCallButton = new Html("button")
-                        .attr({ title: "End Call", class: "call-btn end-btn" })
-                        .appendTo(uiElements.buttonContainerElement);
-                      endCallButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
-                      endCallButton.on("click", () =>
-                        cleanupReceivedCall("User Ended")
-                      );
-                    }
-
-                    audioPlayerElement = new Html("audio")
-                      .attr({ autoplay: true, controls: false })
-                      .styleJs({ display: "none" });
-                    try {
-                      audioPlayerElement.elm.srcObject = remoteStream;
-                      audioPlayerElement.appendTo(CSWindowWrapper);
-                      audioPlayerElement.elm
-                        .play()
-                        .catch((e) => console.warn("Audio play failed:", e));
-                    } catch (e) {
-                      console.error(
-                        "Error setting srcObject for remote audio:",
-                        e
-                      );
-                      Notify.show(
-                        "Pluto Contacts",
-                        "Error playing remote audio."
-                      );
-                      cleanupReceivedCall("Audio Playback Error");
-                      return;
-                    }
-
-                    let startTime = Date.now();
-                    elapsedInt = setInterval(() => {
-                      if (callState !== "in call" || cleanupCalled) {
-                        clearInterval(elapsedInt);
-                        return;
-                      }
-                      let elapsed = Math.floor((Date.now() - startTime) / 1000);
-                      let mins = Math.floor(elapsed / 60)
-                        .toString()
-                        .padStart(2, "0");
-                      let secs = (elapsed % 60).toString().padStart(2, "0");
-                      if (uiElements.timerDisplayElement)
-                        uiElements.timerDisplayElement.text(
-                          `${mins}:${secs} elapsed`
-                        );
-                    }, 1000);
-                  });
-
-                  call.on("close", () => {
-                    if (!cleanupCalled) {
-                      console.log("Call closed by remote peer:", call.peer);
-                      Notify.show(
-                        "Pluto Contacts",
-                        "Call ended by " + callerUsername
-                      );
-                      cleanupReceivedCall("Remote Closed");
-                    }
-                  });
-
-                  call.on("error", (err) => {
-                    if (!cleanupCalled) {
-                      console.error("Call error (receiver side):", err);
-                      Notify.show(
-                        "Pluto Contacts",
-                        `Call error: ${err.message || err.type || "Unknown"}`
-                      );
-                      cleanupReceivedCall("Media Error");
-                    }
-                  });
-                } catch (err) {
-                  console.error("Failed to accept call:", err);
-                  Notify.show(
-                    "Pluto Contacts",
-                    `Error accepting call: ${err.message || "Unknown error"}`
-                  );
-                  if (callDataConn && callDataConn.open) {
-                    try {
-                      callDataConn.send("decline");
-                    } catch (e) {}
+              if (uiElements.buttonContainerElement) {
+                uiElements.buttonContainerElement.clear();
+                const muteButton = new Html("button")
+                  .attr({
+                    title: "Mute/Unmute",
+                    class: "call-btn mute-btn",
+                  })
+                  .appendTo(uiElements.buttonContainerElement);
+                muteButton.elm.innerHTML = icons.mic;
+                muteButton.on("click", () => {
+                  isMuted = !isMuted;
+                  if (localStream) {
+                    localStream.getAudioTracks().forEach((t) => {
+                      t.enabled = !isMuted;
+                    });
                   }
-                  cleanupReceivedCall("Accept Failed");
-                }
-              },
-            },
-            {
-              text: "Decline",
-              type: "negative",
-              callback: () => {
-                if (cleanupCalled || callState !== "receiving a call") return;
+                  muteButton.elm.innerHTML = isMuted ? icons.micOff : icons.mic;
+                });
 
-                clearInterval(callSignalInterval);
-                console.log("User declined call from:", call.peer);
-
-                if (callDataConn && callDataConn.open) {
-                  try {
-                    callDataConn.send("decline");
-                  } catch (e) {}
+                if (callType === "video") {
+                  const videoButton = new Html("button")
+                    .attr({
+                      title: "Turn Camera On/Off",
+                      class: "call-btn mute-btn",
+                    })
+                    .appendTo(uiElements.buttonContainerElement);
+                  videoButton.elm.innerHTML = icons.video;
+                  videoButton.on("click", () => {
+                    isCameraOff = !isCameraOff;
+                    if (localStream) {
+                      localStream.getVideoTracks().forEach((t) => {
+                        t.enabled = !isCameraOff;
+                      });
+                    }
+                    videoButton.elm.innerHTML = isCameraOff
+                      ? icons.videoOff
+                      : icons.video;
+                  });
                 }
-                cleanupReceivedCall("User Declined");
-              },
-            },
-          ],
-          false,
-          "https://prismatic-fairy-9a69bd.netlify.app/assets/Pluto-Contacts-Ringtone.wav",
-          true,
-          (hide) => {
-            let hideNotif = (e) => {
-              console.log("Peer disconnected:", e.detail);
-              console.log("Call peer:", call.peer);
-              callState = "standby";
-              if (call.peer == e.detail) {
+
+                const endCallButton = new Html("button")
+                  .attr({ title: "End Call", class: "call-btn end-btn" })
+                  .appendTo(uiElements.buttonContainerElement);
+                endCallButton.elm.innerHTML = icons.cancel;
+                endCallButton.on("click", () =>
+                  cleanupReceivedCall("User Ended")
+                );
+              }
+              if (callType === "video") {
+                if (uiElements.remoteVideoElement?.elm) {
+                  uiElements.remoteVideoElement.elm.srcObject = remoteStream;
+                  uiElements.remoteVideoElement.elm.play();
+                }
+              } else {
+                audioPlayerElement = new Html("audio")
+                  .attr({ autoplay: true, controls: false })
+                  .styleJs({ display: "none" });
+                try {
+                  audioPlayerElement.elm.srcObject = remoteStream;
+                  audioPlayerElement.appendTo(CSWindowWrapper);
+                  audioPlayerElement.elm
+                    .play()
+                    .catch((e) => console.warn("Audio play failed:", e));
+                } catch (e) {
+                  console.error("Error setting srcObject for remote audio:", e);
+                  Notify.show("Pluto Contacts", "Error playing remote audio.");
+                  cleanupReceivedCall("Audio Playback Error");
+                  return;
+                }
+              }
+
+              let startTime = Date.now();
+              elapsedInt = setInterval(() => {
+                if (callState !== "in call" || cleanupCalled) {
+                  clearInterval(elapsedInt);
+                  return;
+                }
+                let elapsed = Math.floor((Date.now() - startTime) / 1000);
+                let mins = Math.floor(elapsed / 60)
+                  .toString()
+                  .padStart(2, "0");
+                let secs = (elapsed % 60).toString().padStart(2, "0");
+                if (uiElements.timerDisplayElement)
+                  uiElements.timerDisplayElement.text(
+                    `${mins}:${secs} elapsed`
+                  );
+              }, 1000);
+            });
+
+            call.on("close", () => {
+              if (!cleanupCalled) {
+                console.log("Call closed by remote peer:", call.peer);
                 Notify.show(
                   "Pluto Contacts",
-                  `You missed a call from ${callerUsername}.`
+                  "Call ended by " + callerUsername
                 );
-                hide();
-                document.removeEventListener("conn-disconnected", hideNotif);
+                cleanupReceivedCall("Remote Closed");
               }
-              document.addEventListener("app-closing", hideNotif);
-            };
-            document.addEventListener("conn-disconnected", hideNotif);
-            document.addEventListener("app-closing", hideNotif);
+            });
+
+            call.on("error", (err) => {
+              if (!cleanupCalled) {
+                console.error("Call error (receiver side):", err);
+                Notify.show(
+                  "Pluto Contacts",
+                  `Call error: ${err.message || err.type || "Unknown"}`
+                );
+                cleanupReceivedCall("Media Error");
+              }
+            });
+          } catch (err) {
+            console.error("Failed to accept call:", err);
+            Notify.show(
+              "Pluto Contacts",
+              `Error accepting call: ${err.message || "Unknown error"}`
+            );
+            if (callDataConn && callDataConn.open) {
+              try {
+                callDataConn.send("decline");
+              } catch (e) {}
+            }
+            cleanupReceivedCall("Accept Failed");
           }
+        };
+
+        const onDeclineCallback = () => {
+          if (cleanupCalled || callState !== "receiving a call") return;
+
+          clearInterval(callSignalInterval);
+          console.log("User declined call from:", call.peer);
+
+          if (callDataConn && callDataConn.open) {
+            try {
+              callDataConn.send("decline");
+            } catch (e) {}
+          }
+          cleanupReceivedCall("User Declined");
+        };
+
+        if (cleanupCalled) {
+          console.log(
+            "Cleanup was triggered before overlay creation finished. Aborting."
+          );
+          return;
+        }
+
+        callOverlay = await createAndShowIncomingCallOverlay(
+          callerInfo,
+          callType,
+          onAcceptCallback,
+          onDeclineCallback,
+          { stream: localPreviewStream }
         );
+
+        if (cleanupCalled) {
+          console.log(
+            "Call was cancelled during overlay creation. Destroying now."
+          );
+          if (callOverlay && callOverlay.destroy) {
+            callOverlay.destroy();
+          }
+          return;
+        }
       });
 
       peer.on("error", (err) => {
@@ -1220,37 +1590,54 @@ export default {
               })
               .appendTo(contactDiv);
 
+            const commonButtonAction = (type, contact) => {
+              if (!peer || peer.destroyed || !peer.open) {
+                Notify.show(
+                  "Pluto Contacts",
+                  "Not connected to call service. Please wait or restart."
+                );
+                if (!peer || peer.destroyed) {
+                  setupPeer();
+                } else if (peer.disconnected) {
+                  try {
+                    peer.reconnect();
+                  } catch (e) {
+                    console.warn("Reconnect failed on call click", e);
+                    setupPeer();
+                  }
+                }
+                return;
+              }
+              if (callState !== "standby") {
+                Notify.show(
+                  "Pluto Contacts",
+                  `Cannot call while ${callState}.`
+                );
+                return;
+              }
+              initiateCall(contact, type);
+            };
+
+            new Html("button")
+              .html(icons.video)
+              .appendTo(actions)
+              .attr({ title: `Video call ${contact.u}` })
+              .on("click", () => commonButtonAction("video", contact))
+              .styleJs({
+                padding: "8px",
+                minWidth: "auto",
+                aspectRatio: "1 / 1",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              })
+              .elm.classList.add("flex-list", "row", "gap");
+
             new Html("button")
               .html(icons.audio)
               .appendTo(actions)
               .attr({ title: `Audio call ${contact.u}` })
-              .on("click", () => {
-                if (!peer || peer.destroyed || !peer.open) {
-                  Notify.show(
-                    "Pluto Contacts",
-                    "Not connected to call service. Please wait or restart."
-                  );
-                  if (!peer || peer.destroyed) {
-                    setupPeer();
-                  } else if (peer.disconnected) {
-                    try {
-                      peer.reconnect();
-                    } catch (e) {
-                      console.warn("Reconnect failed on call click", e);
-                      setupPeer();
-                    }
-                  }
-                  return;
-                }
-                if (callState !== "standby") {
-                  Notify.show(
-                    "Pluto Contacts",
-                    `Cannot call while ${callState}.`
-                  );
-                  return;
-                }
-                audioCall(contact);
-              })
+              .on("click", () => commonButtonAction("audio", contact))
               .styleJs({
                 padding: "8px",
                 minWidth: "auto",
@@ -1542,107 +1929,126 @@ export default {
       searchInput.on("input", debouncedSearch);
     }
 
-    function createCallWindowUI(wrapper, contact) {
+    function createCallWindowUI(wrapper, contact, callType) {
       wrapper.clear().styleJs({ padding: "0", overflow: "hidden" });
-
       const fullAvPath =
         contact.a && contact.a.startsWith("http")
           ? contact.a
           : "https://zeon.dev" + (contact.a || "/assets/default.png");
+      const returnElements = {};
 
-      wrapper.html(`
+      if (callType === "video") {
+        wrapper.html(`
+          <style>
+            .video-call-wrapper {
+              width: 100%;
+              height: 100%;
+              position: relative;
+              background-color: #000;
+              overflow: hidden;
+            }
+            .remote-video {
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
+              position: absolute;
+              top: 0; left: 0;
+            }
+            .local-video {
+              position: absolute;
+              bottom: 20px;
+              right: 20px;
+              width: 25%;
+              max-width: 200px;
+              border-radius: 8px;
+              border: 2px solid var(--outline);
+              box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+              z-index: 10;
+              transform: scaleX(-1); /* Mirror view */
+            }
+            .call-overlay {
+              position: absolute;
+              top: 0; left: 0; right: 0; bottom: 0;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              padding: 20px;
+              background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 30%, transparent 70%);
+              z-index: 5;
+            }
+            .call-info-top {
+              text-align: left;
+              text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+            }
+            .call-name { font-size: 1.5em; font-weight: 500; color: #fff; margin:0; }
+            .call-status, .call-timer { font-size: 1em; color: #eee; margin: 2px 0; }
+            .call-controls {
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              width: 100%;
+              padding-bottom: 20px;
+            }
+            .call-btn {
+              width: 60px; height: 60px; border-radius: 50%; border: none;
+              display: flex; align-items: center; justify-content: center;
+              cursor: pointer; transition: transform 0.1s ease-out;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            }
+            .call-btn:active { transform: scale(0.95); }
+            .call-btn svg { width: 28px; height: 28px; }
+            .mute-btn { background-color: rgba(255,255,255,0.2); color: #fff; }
+            .end-btn { background-color: var(--error); color: var(--on-error); }
+          </style>
+          <div class="video-call-wrapper">
+              <video class="remote-video" autoplay playsinline></video>
+              <video class="local-video" autoplay muted playsinline></video>
+              <div class="call-overlay">
+                  <div class="call-info-top">
+                      <h1 class="call-name">${contact.u}</h1>
+                      <p class="call-status"></p>
+                      <p class="call-timer"></p>
+                  </div>
+                  <div class="call-controls"></div>
+              </div>
+          </div>
+        `);
+        returnElements.remoteVideoElement = wrapper.qs(".remote-video");
+        returnElements.localVideoElement = wrapper.qs(".local-video");
+      } else {
+        // Audio Call UI
+        wrapper.html(`
             <style>
                 .call-ui-wrapper {
-                    height: 100%;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: space-between;
-                    align-items: center;
-                    padding: 40px 20px;
-                    box-sizing: border-box;
-                    position: relative; /* For pseudo-element positioning */
-                    overflow: hidden; /* To contain the blurred background */
-                    background-color: var(--surface); /* Fallback color */
+                    height: 100%; display: flex; flex-direction: column; justify-content: space-between;
+                    align-items: center; padding: 40px 20px; box-sizing: border-box;
+                    position: relative; overflow: hidden; background-color: var(--surface);
                 }
                 .call-ui-wrapper::before {
-                    content: '';
-                    position: absolute;
-                    top: -20px; /* Extend to avoid edge artifacts from blur */
-                    left: -20px;
-                    right: -20px;
-                    bottom: -20px;
+                    content: ''; position: absolute; top: -20px; left: -20px; right: -20px; bottom: -20px;
                     background: url('${fullAvPath}') center center / cover;
-                    filter: blur(100px) brightness(0.5); /* Blur and darken for readability */
-                    z-index: 1;
+                    filter: blur(100px) brightness(0.5); z-index: 1;
                 }
-                .call-info, .call-controls {
-                    position: relative;
-                    z-index: 2; /* Ensure content is on top of the background */
-                    text-shadow: 0 1px 4px rgba(0,0,0,0.7);
-                }
-                .call-info {
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    text-align: center;
-                    margin-top: 20px;
-                }
+                .call-info, .call-controls { position: relative; z-index: 2; text-shadow: 0 1px 4px rgba(0,0,0,0.7); }
+                .call-info { display: flex; flex-direction: column; align-items: center; text-align: center; margin-top: 20px; }
                 .call-avatar {
-                    width: 120px;
-                    height: 120px;
-                    border-radius: 50%;
-                    object-fit: cover;
-                    margin-bottom: 20px;
-                    border: 3px solid rgba(255, 255, 255, 0.6);
-                    background-color: var(--surface-container-high);
-                    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+                    width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
+                    margin-bottom: 20px; border: 3px solid rgba(255, 255, 255, 0.6);
+                    background-color: var(--surface-container-high); box-shadow: 0 4px 15px rgba(0,0,0,0.5);
                 }
-                .call-name {
-                    font-size: 2.2em;
-                    font-weight: 500;
-                    margin: 0 0 5px 0;
-                    color: #fff;
-                }
-                .call-status, .call-timer {
-                    font-size: 1.1em;
-                    margin: 2px 0;
-                    color: #eee;
-                    opacity: 0.9;
-                }
-                .call-controls {
-                    display: flex;
-                    justify-content: center;
-                    gap: 30px;
-                    width: 100%;
-                    padding-bottom: 20px;
-                }
+                .call-name { font-size: 2.2em; font-weight: 500; margin: 0 0 5px 0; color: #fff; }
+                .call-status, .call-timer { font-size: 1.1em; margin: 2px 0; color: #eee; opacity: 0.9; }
+                .call-controls { display: flex; justify-content: center; gap: 30px; width: 100%; padding-bottom: 20px; }
                 .call-btn {
-                    width: 64px;
-                    height: 64px;
-                    border-radius: 50%;
-                    border: none;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    cursor: pointer;
-                    transition: transform 0.1s ease-out;
+                    width: 64px; height: 64px; border-radius: 50%; border: none;
+                    display: flex; align-items: center; justify-content: center;
+                    cursor: pointer; transition: transform 0.1s ease-out;
                     box-shadow: 0 2px 8px rgba(0,0,0,0.4);
                 }
-                .call-btn:active {
-                  transform: scale(0.95);
-                }
-                .call-btn svg {
-                    width: 32px;
-                    height: 32px;
-                }
-                .mute-btn {
-                    background-color: rgba(255,255,255,0.2);
-                    color: #fff;
-                }
-                .end-btn {
-                    background-color: var(--negative);
-                    color: var(--on-error);
-                }
+                .call-btn:active { transform: scale(0.95); }
+                .call-btn svg { width: 32px; height: 32px; }
+                .mute-btn { background-color: rgba(255,255,255,0.2); color: #fff; }
+                .end-btn { background-color: var(--error); color: var(--on-error); }
             </style>
             <div class="call-ui-wrapper">
                 <div class="call-info">
@@ -1651,21 +2057,20 @@ export default {
                     <p class="call-status"></p>
                     <p class="call-timer"></p>
                 </div>
-                <div class="call-controls">
-                </div>
+                <div class="call-controls"></div>
             </div>
         `);
+      }
 
-      return {
-        callStatusElement: wrapper.qs(".call-status"),
-        timerDisplayElement: wrapper.qs(".call-timer"),
-        buttonContainerElement: wrapper.qs(".call-controls"),
-      };
+      returnElements.callStatusElement = wrapper.qs(".call-status");
+      returnElements.timerDisplayElement = wrapper.qs(".call-timer");
+      returnElements.buttonContainerElement = wrapper.qs(".call-controls");
+      return returnElements;
     }
 
-    async function audioCall(contact, pid = -1) {
+    async function initiateCall(contact, callType, pid = -1) {
       const { u: name, id, a: avatar } = contact;
-      console.log(`Initiating audio call to ${name} (ID: ${id})`);
+      console.log(`Initiating ${callType} call to ${name} (ID: ${id})`);
 
       if (name == userData.username) {
         Notify.show("Pluto Contacts", "You can't call yourself.");
@@ -1734,7 +2139,7 @@ export default {
 
       callState = "dialing";
 
-      let localAudioStream = null;
+      let localStream = null;
       let CSWindow = null;
       let conn = null;
       let call = null;
@@ -1744,6 +2149,7 @@ export default {
       let uiElements = {};
       let audioPlayerElement = null;
       let isMuted = false;
+      let isCameraOff = false;
 
       const peerID = `${name}-${String(id)}`;
 
@@ -1753,26 +2159,46 @@ export default {
         console.log(
           `Cleaning up initiated call (${reason}). Current state: ${callState}`
         );
+
+        const shouldSendCancel = callState === "dialing" && conn && conn.open;
+        if (shouldSendCancel) {
+          try {
+            conn.send("cancel");
+          } catch (e) {
+            console.warn("Failed to send cancel signal:", e);
+          }
+        }
+
         callState = "standby";
 
         clearInterval(timeoutInt);
         clearInterval(elapsedInt);
         if (onDecline) document.removeEventListener("call-decline", onDecline);
 
-        if (localAudioStream) {
-          localAudioStream.getTracks().forEach((track) => track.stop());
-          localAudioStream = null;
+        if (localStream) {
+          localStream.getTracks().forEach((track) => track.stop());
+          localStream = null;
         }
         if (call) {
           call.close();
           call = null;
         }
-        if (conn && conn.open) {
-          try {
-            conn.close();
-          } catch (e) {}
-          conn = null;
+
+        const closeConnection = () => {
+          if (conn) {
+            try {
+              conn.close();
+            } catch (e) {}
+            conn = null;
+          }
+        };
+
+        if (shouldSendCancel) {
+          setTimeout(closeConnection, 200);
+        } else {
+          closeConnection();
         }
+
         if (CSWindow && !CSWindow.closed) {
           CSWindow.close();
           CSWindow = null;
@@ -1780,7 +2206,7 @@ export default {
         windows = windows.filter((w) => w !== CSWindow);
 
         if (audioPlayerElement) {
-          audioPlayerElement.elm.remove();
+          audioPlayerElement.cleanup();
           audioPlayerElement = null;
         }
         if (globalCall === call) globalCall = null;
@@ -1800,17 +2226,28 @@ export default {
       };
 
       try {
-        localAudioStream = await navigator.mediaDevices.getUserMedia({
-          video: false,
-          audio: true,
-        });
+        const prefs = await loadCallPreferences();
+        const mediaConstraints = {
+          audio: prefs.audioDeviceId
+            ? { deviceId: { exact: prefs.audioDeviceId } }
+            : true,
+          video:
+            callType === "video"
+              ? prefs.videoDeviceId
+                ? { deviceId: { exact: prefs.videoDeviceId } }
+                : true
+              : false,
+        };
+        localStream = await navigator.mediaDevices.getUserMedia(
+          mediaConstraints
+        );
 
         CSWindow = new Win({
           title: `Calling ${name}`,
           content: "",
           pid: Root.PID,
-          width: 360,
-          height: 550,
+          width: callType === "video" ? 854 : 360,
+          height: callType === "video" ? 480 : 550,
           onclose: () => {
             cleanupCall("Window Closed");
           },
@@ -1820,13 +2257,16 @@ export default {
           CSWindow.window.querySelector(".win-content")
         );
 
-        uiElements = createCallWindowUI(CSWindowWrapper, contact);
+        uiElements = createCallWindowUI(CSWindowWrapper, contact, callType);
         uiElements.callStatusElement.text("Dialing...");
+        if (callType === "video" && uiElements.localVideoElement?.elm) {
+          uiElements.localVideoElement.elm.srcObject = localStream;
+        }
 
         const cancelButton = new Html("button")
           .attr({ title: "Cancel Call", class: "call-btn end-btn" })
           .appendTo(uiElements.buttonContainerElement);
-        cancelButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
+        cancelButton.elm.innerHTML = icons.cancel;
         cancelButton.on("click", () => {
           cleanupCall("User Canceled");
           if (onDecline)
@@ -1870,7 +2310,9 @@ export default {
           if (uiElements.callStatusElement)
             uiElements.callStatusElement.text("Ringing...");
 
-          call = peer.call(peerID, localAudioStream);
+          call = peer.call(peerID, localStream, {
+            metadata: { type: callType },
+          });
           globalCall = call;
 
           if (!call) {
@@ -1899,37 +2341,65 @@ export default {
               const muteButton = new Html("button")
                 .attr({ title: "Mute/Unmute", class: "call-btn mute-btn" })
                 .appendTo(uiElements.buttonContainerElement);
-              muteButton.elm.innerHTML = icons.mic; // FIX: Use innerHTML
+              muteButton.elm.innerHTML = icons.mic;
               muteButton.on("click", () => {
                 isMuted = !isMuted;
-                if (localAudioStream) {
-                  localAudioStream.getAudioTracks().forEach((t) => {
+                if (localStream) {
+                  localStream.getAudioTracks().forEach((t) => {
                     t.enabled = !isMuted;
                   });
                 }
                 muteButton.elm.innerHTML = isMuted ? icons.micOff : icons.mic;
               });
 
+              if (callType === "video") {
+                const videoButton = new Html("button")
+                  .attr({
+                    title: "Turn Camera On/Off",
+                    class: "call-btn mute-btn",
+                  })
+                  .appendTo(uiElements.buttonContainerElement);
+                videoButton.elm.innerHTML = icons.video;
+                videoButton.on("click", () => {
+                  isCameraOff = !isCameraOff;
+                  if (localStream) {
+                    localStream.getVideoTracks().forEach((t) => {
+                      t.enabled = !isCameraOff;
+                    });
+                  }
+                  videoButton.elm.innerHTML = isCameraOff
+                    ? icons.videoOff
+                    : icons.video;
+                });
+              }
+
               const endCallButton = new Html("button")
                 .attr({ title: "End Call", class: "call-btn end-btn" })
                 .appendTo(uiElements.buttonContainerElement);
-              endCallButton.elm.innerHTML = icons.cancel; // FIX: Use innerHTML
+              endCallButton.elm.innerHTML = icons.cancel;
               endCallButton.on("click", () => cleanupCall("User Ended"));
             }
 
-            audioPlayerElement = new Html("audio")
-              .attr({ autoplay: true, controls: false })
-              .styleJs({ display: "none" });
-            try {
-              audioPlayerElement.elm.srcObject = remoteStream;
-              audioPlayerElement.appendTo(CSWindowWrapper);
-              audioPlayerElement.elm
-                .play()
-                .catch((e) => console.warn("Audio play failed:", e));
-            } catch (e) {
-              Notify.show("Pluto Contacts", "Error playing remote audio.");
-              cleanupCall("Audio Playback Error");
-              return;
+            if (callType === "video") {
+              if (uiElements.remoteVideoElement?.elm) {
+                uiElements.remoteVideoElement.elm.srcObject = remoteStream;
+                uiElements.remoteVideoElement.elm.play();
+              }
+            } else {
+              audioPlayerElement = new Html("audio")
+                .attr({ autoplay: true, controls: false })
+                .styleJs({ display: "none" });
+              try {
+                audioPlayerElement.elm.srcObject = remoteStream;
+                audioPlayerElement.appendTo(CSWindowWrapper);
+                audioPlayerElement.elm
+                  .play()
+                  .catch((e) => console.warn("Audio play failed:", e));
+              } catch (e) {
+                Notify.show("Pluto Contacts", "Error playing remote audio.");
+                cleanupCall("Audio Playback Error");
+                return;
+              }
             }
 
             let startTime = Date.now();
@@ -2012,22 +2482,22 @@ export default {
           err.name === "PermissionDeniedError"
         ) {
           message =
-            "Microphone access denied. Please allow microphone permissions.";
+            "Camera/Microphone access denied. Please allow permissions.";
           reason = "Permission Denied";
           persist = true;
         } else if (
           err.name === "NotFoundError" ||
           err.name === "DevicesNotFoundError"
         ) {
-          message = "No microphone found. Please connect a microphone.";
-          reason = "No Microphone";
+          message = "No camera/microphone found. Please connect a device.";
+          reason = "No Device";
           persist = true;
         } else if (
           err.name === "NotReadableError" ||
           err.name === "TrackStartError"
         ) {
-          message = "Microphone is busy or cannot be read.";
-          reason = "Mic Busy";
+          message = "Your camera/microphone is busy or cannot be read.";
+          reason = "Device Busy";
           persist = true;
         } else {
           reason = "getUserMedia Failed";
@@ -2225,7 +2695,7 @@ export default {
               }
 
               sendUpdate(`Initiating audio call with ${contactNameToCall}...`);
-              audioCall(contactToCall, m.pid);
+              initiateCall(contactToCall, "audio", m.pid);
               break;
 
             default:
