@@ -77,6 +77,12 @@ export default {
         zIndex: "-1",
         backgroundImage: "url(" + determinedImage + ")",
         backgroundSize: "cover",
+        backgroundAttachment: "fixed",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center center",
+        inset: "0px",
+        transition: "opacity 2s linear",
+        opacity: 1,
       })
       .appendTo(wrapper);
 
@@ -155,8 +161,8 @@ export default {
       .class("smc", "hide")
       .style({
         display: "grid",
-        "grid-template-columns": "repeat(7, 1fr)", // 7 apps across
-        "grid-auto-rows": "155px", // fixed app slot height
+        "grid-template-columns": "repeat(6, 1fr)", // 7 apps across
+        "grid-auto-rows": "145px", // fixed app slot height
         "justify-items": "center",
         "align-items": "start",
         gap: "10px",
@@ -285,6 +291,7 @@ export default {
             })
           )
           .on("click", async () => {
+            toggleSmc();
             if (app.type === "desktop") {
               try {
                 let shrt = JSON.parse(
@@ -312,7 +319,6 @@ export default {
                 console.log("Couldn't load the application");
               }
             }
-            toggleSmc();
           })
           .appendTo(smc);
       }
