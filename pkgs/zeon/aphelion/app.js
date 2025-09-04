@@ -156,20 +156,19 @@ export default {
       });
     }
 
-    // Launcher container
     let smc = new Html("div")
       .class("smc", "hide")
       .style({
         display: "grid",
-        "grid-template-columns": "repeat(6, 1fr)", // 7 apps across
-        "grid-auto-rows": "145px", // fixed app slot height
+        "grid-template-columns": "repeat(auto-fit, minmax(145px, 1fr))",
+        "grid-auto-rows": "145px", // fixed slot height
         "justify-items": "center",
         "align-items": "start",
         gap: "10px",
         width: "100%",
         height: "100%",
         margin: 0,
-        padding: "40px 20px", // fixed top/bottom spacing
+        padding: "40px 20px",
         position: "fixed",
         top: 0,
         left: 0,
@@ -179,7 +178,7 @@ export default {
         "backdrop-filter": "blur(10px)",
         background: "rgba(0,0,0,0.3)",
         "box-sizing": "border-box",
-        "overflow-y": "auto", // allow scrolling if too many apps
+        "overflow-y": "auto",
       })
       .appendTo(wrapper);
 
