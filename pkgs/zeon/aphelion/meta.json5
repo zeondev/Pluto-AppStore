@@ -22,11 +22,16 @@
   // The version history of your app (descending).
   versions: [
     {
+      ver: "1.0.1",
+      cmp: 1.6,
+      date: "2025-09-04T10:50:00.000Z",
+    },
+    {
       ver: "1.0.0",
       cmp: 1.6,
       date: "2025-09-04T01:30:00.000Z",
     },
   ],
   // A long description (text only) of the details of the latest update.
-  latestVersionInfo: "Initial release!",
+  latestVersionInfo: "Quick bug fixes and implemented logout timer.",
 }
