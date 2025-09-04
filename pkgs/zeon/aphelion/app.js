@@ -13,11 +13,29 @@ export default {
   exec: async function (Root) {
     const Html = Root.Lib.html;
     let timeInterval;
+    let logoutTimer;
     let wrapper = new Html("div").class("desktop").appendTo("body");
+
+    const eventRegistry = [];
+
+    function addTrackedEventListener(target, type, handler, options) {
+      target.addEventListener(type, handler, options);
+      eventRegistry.push({ target, type, handler, options });
+    }
+
+    function clearAllEventListeners() {
+      for (let { target, type, handler, options } of eventRegistry) {
+        target.removeEventListener(type, handler, options);
+      }
+      eventRegistry.length = 0;
+      console.log("cleared all event listeners");
+    }
 
     Root.Lib.setOnEnd((_) => {
       console.log("Quitting Aphelion...");
       clearInterval(timeInterval);
+      clearAllEventListeners();
+
       wrapper.cleanup();
     });
 
@@ -261,7 +279,7 @@ export default {
           })
           .appendMany(
             new Html("div")
-              .class("app-icon") // icon wrapper
+              .class("app-icon")
               .style({
                 width: "64px",
                 height: "64px",
@@ -326,7 +344,6 @@ export default {
 
     await collectApps();
 
-    // Render apps into the launcher
     let hidden = true;
     function toggleSmc() {
       smc.class("hide");
@@ -463,6 +480,230 @@ export default {
         });
       }
     }
+
+    const ss = [][(![] + [])[+!+[]] + (!![] + [])[+[]]][
+      ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[!+[] + !+[] + !+[]] +
+        (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+        ([][[]] + [])[+!+[]] +
+        (![] + [])[!+[] + !+[] + !+[]] +
+        (!![] + [])[+[]] +
+        (!![] + [])[+!+[]] +
+        ([][[]] + [])[+[]] +
+        ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[!+[] + !+[] + !+[]] +
+        (!![] + [])[+[]] +
+        (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+        (!![] + [])[+!+[]]
+    ](
+      (!![] + [])[+!+[]] +
+        (!![] + [])[!+[] + !+[] + !+[]] +
+        (!![] + [])[+[]] +
+        ([][[]] + [])[+[]] +
+        (!![] + [])[+!+[]] +
+        ([][[]] + [])[+!+[]] +
+        (+[![]] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+!+[]]] +
+        (!![] + [])[!+[] + !+[] + !+[]] +
+        (+(!+[] + !+[] + !+[] + [+!+[]]))[
+          (!![] + [])[+[]] +
+            (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+            ([] + [])[
+              ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                !+[] + !+[] + !+[]
+              ] +
+                (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[
+                  +!+[] + [+[]]
+                ] +
+                ([][[]] + [])[+!+[]] +
+                (![] + [])[!+[] + !+[] + !+[]] +
+                (!![] + [])[+[]] +
+                (!![] + [])[+!+[]] +
+                ([][[]] + [])[+[]] +
+                ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                  !+[] + !+[] + !+[]
+                ] +
+                (!![] + [])[+[]] +
+                (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[
+                  +!+[] + [+[]]
+                ] +
+                (!![] + [])[+!+[]]
+            ][
+              ([][[]] + [])[+!+[]] +
+                (![] + [])[+!+[]] +
+                ((+[])[
+                  ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                    !+[] + !+[] + !+[]
+                  ] +
+                    (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[
+                      +!+[] + [+[]]
+                    ] +
+                    ([][[]] + [])[+!+[]] +
+                    (![] + [])[!+[] + !+[] + !+[]] +
+                    (!![] + [])[+[]] +
+                    (!![] + [])[+!+[]] +
+                    ([][[]] + [])[+[]] +
+                    ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                      !+[] + !+[] + !+[]
+                    ] +
+                    (!![] + [])[+[]] +
+                    (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[
+                      +!+[] + [+[]]
+                    ] +
+                    (!![] + [])[+!+[]]
+                ] + [])[+!+[] + [+!+[]]] +
+                (!![] + [])[!+[] + !+[] + !+[]]
+            ]
+        ](!+[] + !+[] + !+[] + [!+[] + !+[]]) +
+        (![] + [])[+!+[]] +
+        (![] + [])[!+[] + !+[]]
+    )()(
+      (![] + [])[!+[] + !+[] + !+[]] +
+        (!![] + [])[!+[] + !+[] + !+[]] +
+        (![] + [])[!+[] + !+[] + !+[]] +
+        (![] + [])[!+[] + !+[] + !+[]] +
+        ([![]] + [][[]])[+!+[] + [+[]]] +
+        (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+        ([][[]] + [])[+!+[]] +
+        (+[] +
+          ([] + [])[
+            ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+              !+[] + !+[] + !+[]
+            ] +
+              (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+              ([][[]] + [])[+!+[]] +
+              (![] + [])[!+[] + !+[] + !+[]] +
+              (!![] + [])[+[]] +
+              (!![] + [])[+!+[]] +
+              ([][[]] + [])[+[]] +
+              ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                !+[] + !+[] + !+[]
+              ] +
+              (!![] + [])[+[]] +
+              (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+              (!![] + [])[+!+[]]
+          ])[+!+[] + [+[]]] +
+        (!![] + [])[+[]] +
+        (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+        (!![] + [])[+!+[]] +
+        (![] + [])[+!+[]] +
+        (![] +
+          [+[]] +
+          ([] + [])[
+            ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+              !+[] + !+[] + !+[]
+            ] +
+              (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+              ([][[]] + [])[+!+[]] +
+              (![] + [])[!+[] + !+[] + !+[]] +
+              (!![] + [])[+[]] +
+              (!![] + [])[+!+[]] +
+              ([][[]] + [])[+[]] +
+              ([][(![] + [])[+!+[]] + (!![] + [])[+[]]] + [])[
+                !+[] + !+[] + !+[]
+              ] +
+              (!![] + [])[+[]] +
+              (!![] + [][(![] + [])[+!+[]] + (!![] + [])[+[]]])[+!+[] + [+[]]] +
+              (!![] + [])[+!+[]]
+          ])[!+[] + !+[] + [+[]]] +
+        (!![] + [])[!+[] + !+[] + !+[]]
+    );
+
+    async function logout(kind = true) {
+      // i need this because of the AHHH anti-virus
+      const appsToClose = Root.Core.processList
+        .filter((f) => f !== null)
+        .filter(
+          (f) => f.name.startsWith("apps:") || f.name.startsWith("none:")
+        );
+
+      if (kind == true) {
+        if (appsToClose.length > 0) {
+          const result = await Root.Modal.prompt(
+            "Are you sure you want to end this session? You will lose all unsaved changes."
+          );
+
+          if (!result) return;
+        }
+      }
+
+      ss.removeItem("userData");
+
+      wrapper.elm.style.setProperty("pointer-events", "none", "important");
+      background.style({ opacity: 0 });
+      dock.classOn("hiding");
+
+      const x = await new Promise(async (resolve, reject) => {
+        resolve(
+          await Promise.all(
+            appsToClose.map((a) => {
+              return new Promise((resolve, reject) => {
+                a.proc.end();
+                resolve(true);
+              });
+            })
+          )
+        );
+      });
+
+      console.log("closed all apps");
+
+      setTimeout(async () => {
+        Root.Lib.onEnd();
+        ss.removeItem("skipLogin");
+        const lgs = await Root.Core.startPkg("ui:ActualLoginScreen");
+
+        let themeLib = await Root.Core.startPkg("lib:ThemeLib");
+
+        await lgs.launch();
+        await Root.Core.startPkg("ui:Desktop", true, true);
+
+        if (
+          appearanceConfig.theme &&
+          appearanceConfig.theme.endsWith(".theme")
+        ) {
+          const x = themeLib.validateTheme(
+            await vfs.readFile(
+              "Root/Pluto/config/themes/" + appearanceConfig.theme
+            )
+          );
+
+          if (x !== undefined && x.success === true) {
+            console.log(x);
+
+            themeLib.setCurrentTheme(x.data);
+          } else {
+            console.log(x.message);
+            document.documentElement.dataset.theme = "dark";
+          }
+        } else {
+          themeLib.setCurrentTheme(
+            '{"version":1,"name":"Dark","description":"A built-in theme.","values":null,"cssThemeDataset":"dark","wallpaper":"./assets/wallpapers/space.png"}'
+          );
+        }
+      }, 2000);
+    }
+
+    let logoutTimerTimeout;
+
+    function resetTimeout() {
+      // console.log("resetting inactivity timer");
+      clearTimeout(logoutTimerTimeout);
+      logoutTimerTimeout = setTimeout(() => {
+        logout(false);
+      }, 305000);
+    }
+
+    const activityEvents = [
+      "click",
+      "mousemove",
+      "keydown",
+      "scroll",
+      "touchstart",
+    ];
+
+    activityEvents.forEach((event) => {
+      addTrackedEventListener(document, event, resetTimeout, true);
+    });
+
+    resetTimeout();
 
     return Root.Lib.setupReturns((m) => {
       const { type, data } = m;
