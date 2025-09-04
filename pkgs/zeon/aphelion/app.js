@@ -432,6 +432,11 @@ export default {
         visibility: hidden;
         pointer-events: none; /* so clicks don't register while hidden */
       }
+      
+      #snap-indicator {
+        opacity: 0 !important;
+        display:none !important;
+      }
 
       `
       )
